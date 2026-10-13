@@ -13,10 +13,10 @@
 
 
 (* --- Hoist Usage Statements into the Developer Context --- *)
-Needs["GWPTools`GWPDeveloper`"]
-BeginPackage["GWPTools`GWPDeveloper`"]
+Needs["MaddoxScience`GWPTools`GWPDeveloper`"]
+BeginPackage["MaddoxScience`GWPTools`GWPDeveloper`"]
 
-If[TrueQ[Global`$GWPDebug], Print["[GWPEngine2D] BeginPackage GWPDeveloper"]];
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPEngine2D] BeginPackage GWPDeveloper"]];
 
 Off[General::shdw];
 
@@ -113,12 +113,12 @@ GWP2DRHOX::usage = "GWP2DRHOX[x, y][param] evaluates the real-valued spatial pro
 
 Off[General::shdw];
 
-If[TrueQ[Global`$GWPDebug], Print["[GWPEngine2D] EndPackage GWPDeveloper"]];
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPEngine2D] EndPackage GWPDeveloper"]];
 
 Quiet[EndPackage[], General::shdw]
 
 (* Scrub the Developer context from the global path immediately *)
-$ContextPath = DeleteCases[$ContextPath, "GWPTools`GWPDeveloper`"];
+$ContextPath = DeleteCases[$ContextPath, "MaddoxScience`GWPTools`GWPDeveloper`"];
 
 
 (* ::Section::Closed:: *)
@@ -126,18 +126,18 @@ $ContextPath = DeleteCases[$ContextPath, "GWPTools`GWPDeveloper`"];
 
 
 (* ========================================================================= *)
-(* PACKAGE     : GWPTools`GWPEngine2D`                                       *)
+(* PACKAGE     : MaddoxScience`GWPTools`GWPEngine2D`                         *)
 (* DESCRIPTION : 2D Gaussian Wavepacket Core Engine                          *)
 (* ========================================================================= *)
 
-BeginPackage["GWPTools`GWPEngine2D`"]
-If[TrueQ[Global`$GWPDebug], Print["[GWPEngine2D] BeginPackage"]];
+BeginPackage["MaddoxScience`GWPTools`GWPEngine2D`"]
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPEngine2D] BeginPackage"]];
 
 Begin["`Private`"]
-If[TrueQ[Global`$GWPDebug], Print["[GWPEngine2D] Begin Private"]];
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPEngine2D] Begin Private"]];
 
-Needs["GWPTools`GWPDeveloper`"];
-Needs["GWPTools`GWPRegistry`"];
+Needs["MaddoxScience`GWPTools`GWPDeveloper`"];
+Needs["MaddoxScience`GWPTools`GWPRegistry`"];
 
 
 (* ::Section::Closed:: *)
@@ -545,7 +545,7 @@ $potentials2D = {
   {"Harmonic",  GWP2DHARMONIC,  "{\"Harmonic\", OMEGAX, OMEGAY, OMEGAXY}", "Parameterized"}
 };
 
-GWPTools`GWPRegistry`GWPRegisterPotentials[$potentials2D, "2D"];
+MaddoxScience`GWPTools`GWPRegistry`GWPRegisterPotentials[$potentials2D, "2D"];
 Clear[$potentials2D];
 
 
@@ -608,10 +608,10 @@ $regExt2D = Join[#, {"ExternalFields", "2D"}] & /@ {
 };
 
 (* --- Registry Assembly --- *)
-$reg2D = Join[$regStatic2D, $regDynamic2D, $regWave2D, $regProb2D, $regExp2D, $regExt2D];
-Clear[$regStatic2D, $regDynamic2D, $regWave2D, $regProb2D, $regExp2D, $regExt2D];
+$reg2D = Join[$regStatic2D,$regDynamic2D, $regWave2D,$regProb2D, $regExp2D,$regExt2D];
+Clear[$regStatic2D,$regDynamic2D, $regWave2D,$regProb2D, $regExp2D,$regExt2D];
 
-GWPTools`GWPRegistry`GWPRegisterExtension[$reg2D];
+MaddoxScience`GWPTools`GWPRegistry`GWPRegisterExtension[$reg2D];
 Clear[$reg2D];
 
 
@@ -636,7 +636,7 @@ Opacity[0.8],Rotate[Circle[{0,0},{0.5,0.25}],Pi/4],
 Opacity[1],Rotate[Circle[{0,0},{0.2,0.1}],Pi/4]},
 ImageSize->32,PlotRange->{{-1,1},{-1,1}},AspectRatio->1];
 
-GWPTools`GWPDeveloper`GWP2DUI[data_] := Module[
+MaddoxScience`GWPTools`GWPDeveloper`GWP2DUI[data_] := Module[
   {potDisplay, paramsList, h, m, init, visible, hidden},
   
   potDisplay = data["Potential"];
@@ -667,13 +667,16 @@ GWPTools`GWPDeveloper`GWP2DUI[data_] := Module[
 (*End*)
 
 
-(* --- End "GWPTools`GWPEngine2D`Private`" --- *)
-If[TrueQ[Global`$GWPDebug], Print["[GWPEngine2D] End Private"]];
+(* --- End "MaddoxScience`GWPTools`GWPEngine2D`Private`" --- *)
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPEngine2D] End Private"]];
 End[]
 
 (* Hide internal code for all Developer functions from the ? menu *)
-SetAttributes[Evaluate[Names["GWPTools`GWPEngine2D`*"]], {ReadProtected}];
+SetAttributes[Evaluate[Names["MaddoxScience`GWPTools`GWPEngine2D`*"]], {ReadProtected}];
 
-(* --- End "GWPTools`GWPEngine2D`" --- *)
-If[TrueQ[Global`$GWPDebug], Print["[GWPEngine2D] EndPackage"]];
+(* --- End "MaddoxScience`GWPTools`GWPEngine2D`" --- *)
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPEngine2D] EndPackage"]];
 EndPackage[]
+
+(* Scrub backend context to keep the user namespace pristine *)
+$ContextPath = DeleteCases[$ContextPath, "MaddoxScience`GWPTools`GWPEngine2D`"];

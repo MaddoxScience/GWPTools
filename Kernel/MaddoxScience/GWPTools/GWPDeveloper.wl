@@ -9,12 +9,12 @@
 
 
 (* ========================================================================= *)
-(* PACKAGE     : GWPTools`GWPDeveloper`                                      *)
+(* PACKAGE     : MaddoxScience`GWPTools`GWPDeveloper`                        *)
 (* DESCRIPTION : The master namespace bridge and global developer utilities. *)
 (*               Houses the universal parameter dictionary and usage tables. *)
 (* ========================================================================= *)
-BeginPackage["GWPTools`GWPDeveloper`"]
-If[TrueQ[Global`$GWPDebug], Print["[GWPDeveloper] BeginPackage"]];
+BeginPackage["MaddoxScience`GWPTools`GWPDeveloper`"]
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPDeveloper] BeginPackage"]];
 
 (* Suppress parse-time shadowing warnings for same-cell evaluations *)
 Off[General::shdw];
@@ -102,7 +102,7 @@ GWPScalarQ::usage = "GWPScalarQ[exp] returns True if exp is a scalar symbol or n
 On[General::shdw];
 (* --- Private --- *)
 Begin["`Private`"]
-If[TrueQ[Global`$GWPDebug], Print["[GWPDeveloper] Begin Private"]];
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPDeveloper] Begin Private"]];
 
 
 (* ::Section::Closed:: *)
@@ -168,13 +168,13 @@ GWPScalarQ[val_] := FreeQ[val, List];
 (*End*)
 
 
-(* --- End "GWPTools`GWPDeveloper`Private`" --- *)
-If[TrueQ[Global`$GWPDebug], Print["[GWPDeveloper] End Private"]];
+(* --- End "MaddoxScience`GWPTools`GWPDeveloper`Private`" --- *)
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPDeveloper] End Private"]];
 End[]
 
 (* Hide internal code for all Developer functions from the ? menu *)
-SetAttributes[Evaluate[Names["GWPTools`GWPDeveloper`*"]], {ReadProtected}];
+SetAttributes[Evaluate[Names["MaddoxScience`GWPTools`GWPDeveloper`*"]], {ReadProtected}];
 
-(* --- End "GWPTools`GWPDeveloper`" --- *)
-If[TrueQ[Global`$GWPDebug], Print["[GWPDeveloper] EndPackage"]];
+(* --- End "MaddoxScience`GWPTools`GWPDeveloper`" --- *)
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPDeveloper] EndPackage"]];
 Quiet[EndPackage[], General::shdw]

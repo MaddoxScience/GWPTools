@@ -9,16 +9,16 @@
 
 
 (* ========================================================================= *)
-(* PACKAGE     : GWPTools`GWPPhaseSpace`                                     *)
+(* PACKAGE     : MaddoxScience`GWPTools`GWPPhaseSpace`                       *)
 (* DESCRIPTION : Master orchestrator for Phase Space extensions.             *)
 (*               Dynamically loads subpackages based on active GWP engines.  *)
 (* ========================================================================= *)
 
-BeginPackage["GWPTools`GWPPhaseSpace`"]
-If[TrueQ[Global`$GWPDebug], Print["[GWPPhaseSpace] BeginPackage"]];
+BeginPackage["MaddoxScience`GWPTools`GWPPhaseSpace`"]
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPPhaseSpace] BeginPackage"]];
 
 Begin["`Private`"]
-If[TrueQ[Global`$GWPDebug], Print["[GWPPhaseSpace] Begin Private"]];
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPPhaseSpace] Begin Private"]];
 
 
 (* ::Section::Closed:: *)
@@ -28,11 +28,11 @@ If[TrueQ[Global`$GWPDebug], Print["[GWPPhaseSpace] Begin Private"]];
 (* Helper to safely load a subpackage if its parent engine is active *)
 LoadPhaseSpaceExtension[type_, context_] := Module[{engineParamSymbol, packagePath},
   (* We check if the engine's core parameter builder exists in the kernel *)
-  engineParamSymbol = "GWPTools`GWPDeveloper`GWP" <> type <> "PARAM";
+  engineParamSymbol = "MaddoxScience`GWPTools`GWPDeveloper`GWP" <> type <> "PARAM";
   
   If[NameQ[engineParamSymbol],
-    packagePath = "GWPTools`" <> context <> "`";
-    If[TrueQ[Global`$GWPDebug], Print["[GWPPhaseSpace] Loading Extension: ", packagePath]];
+    packagePath = "MaddoxScience`GWPTools`" <> context <> "`";
+    If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPPhaseSpace] Loading Extension: ", packagePath]];
     Quiet[Needs[packagePath]];
   ]
 ];
@@ -47,13 +47,16 @@ LoadPhaseSpaceExtension["SS1D", "GWPPhaseSpaceSS1D"];
 (*End*)
 
 
-(* --- End "GWPTools`GWPPhaseSpace`Private`" --- *)
-If[TrueQ[Global`$GWPDebug], Print["[GWPPhaseSpace] End Private"]];
+(* --- End "MaddoxScience`GWPTools`GWPPhaseSpace`Private`" --- *)
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPPhaseSpace] End Private"]];
 End[]
 
 (* Hide internal code for all Developer functions from the ? menu *)
-SetAttributes[Evaluate[Names["GWPTools`GWPPhaseSpace`*"]], {ReadProtected}];
+SetAttributes[Evaluate[Names["MaddoxScience`GWPTools`GWPPhaseSpace`*"]], {ReadProtected}];
 
-(* --- End "GWPTools`GWPPhaseSpace`" --- *)
-If[TrueQ[Global`$GWPDebug], Print["[GWPPhaseSpace] EndPackage"]];
+(* --- End "MaddoxScience`GWPTools`GWPPhaseSpace`" --- *)
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPPhaseSpace] EndPackage"]];
 EndPackage[]
+
+(* Scrub backend context to keep the user namespace pristine *)
+$ContextPath = DeleteCases[$ContextPath, "MaddoxScience`GWPTools`GWPPhaseSpace`"];

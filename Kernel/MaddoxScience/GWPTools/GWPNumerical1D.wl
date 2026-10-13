@@ -4,7 +4,7 @@
 (*GWPNumerical1D Package*)
 
 
-(* ::Section::Closed:: *)
+(* ::Section:: *)
 (*GWPDeveloper Usage Registration*)
 
 
@@ -13,16 +13,16 @@
 
 
 (* --- Hoist Usage Statements into the Developer Context --- *)
-Needs["GWPTools`GWPDeveloper`"];
-BeginPackage["GWPTools`GWPDeveloper`"]
+Needs["MaddoxScience`GWPTools`GWPDeveloper`"];
+BeginPackage["MaddoxScience`GWPTools`GWPDeveloper`"]
 
-If[TrueQ[Global`$GWPDebug], Print["[GWPNumerical1D] BeginPackage GWPDeveloper"]];
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPNumerical1D] BeginPackage GWPDeveloper"]];
 
 Off[General::shdw];
 
 
 
-(* ::Subsection::Closed:: *)
+(* ::Subsection:: *)
 (*Usage Statements*)
 
 
@@ -37,12 +37,12 @@ GWP1DNDSolveCache::usage = "GWP1DNDSolveCache is the internal memoization engine
 
 Off[General::shdw];
 
-If[TrueQ[Global`$GWPDebug], Print["[GWPNumerical1D] EndPackage GWPDeveloper"]];
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPNumerical1D] EndPackage GWPDeveloper"]];
 
 Quiet[EndPackage[], General::shdw]
 
 (* Scrub the Developer context from the global path immediately *)
-$ContextPath = DeleteCases[$ContextPath, "GWPTools`GWPDeveloper`"];
+$ContextPath = DeleteCases[$ContextPath, "MaddoxScience`GWPTools`GWPDeveloper`"];
 
 
 
@@ -51,19 +51,19 @@ $ContextPath = DeleteCases[$ContextPath, "GWPTools`GWPDeveloper`"];
 
 
 (* ========================================================================= *)
-(* PACKAGE     : GWPTools`GWPNumerical1D`                                    *)
+(* PACKAGE     : MaddoxScience`GWPTools`GWPNumerical1D`                      *)
 (* DESCRIPTION : Numerical NDSolve integration extensions for 1D GWPs.       *)
 (* ========================================================================= *)
 
-BeginPackage["GWPTools`GWPNumerical1D`"]
-If[TrueQ[Global`$GWPDebug], Print["[GWPNumerical1D] BeginPackage"]];
+BeginPackage["MaddoxScience`GWPTools`GWPNumerical1D`"]
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPNumerical1D] BeginPackage"]];
 Begin["`Private`"]
-If[TrueQ[Global`$GWPDebug], Print["[GWPNumerical1D] Begin Private"]];
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPNumerical1D] Begin Private"]];
 
 (* Load dependencies strictly internally *)
-Needs["GWPTools`GWPDeveloper`"];
-Needs["GWPTools`GWPRegistry`"];
-Needs["GWPTools`GWPEngine1D`"];
+Needs["MaddoxScience`GWPTools`GWPDeveloper`"];
+Needs["MaddoxScience`GWPTools`GWPRegistry`"];
+Needs["MaddoxScience`GWPTools`GWPEngine1D`"];
 
 
 (* ::Section::Closed:: *)
@@ -125,7 +125,7 @@ $potentialsNumerical1D = {
   {"Numerical", GWP1DNUMERICAL, "{\"Numerical\", V0, V1, V2, TMin, TMax, Opts___}", "Parameterized"}
 };
 
-GWPTools`GWPRegistry`GWPRegisterPotentials[$potentialsNumerical1D, "1D"];
+MaddoxScience`GWPTools`GWPRegistry`GWPRegisterPotentials[$potentialsNumerical1D, "1D"];
 Clear[$potentialsNumerical1D];
 
 
@@ -133,13 +133,13 @@ Clear[$potentialsNumerical1D];
 (*End*)
 
 
-(* --- End "GWPTools`GWPNumerical1D`Private`" --- *)
-If[TrueQ[Global`$GWPDebug], Print["[GWPNumerical1D] End Private"]];
+(* --- End "MaddoxScience`GWPTools`GWPNumerical1D`Private`" --- *)
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPNumerical1D] End Private"]];
 End[]
 
 (* Hide internal code for all Developer functions from the ? menu *)
-SetAttributes[Evaluate[Names["GWPTools`GWPNumerical1D`*"]], {ReadProtected}];
+SetAttributes[Evaluate[Names["MaddoxScience`GWPTools`GWPNumerical1D`*"]], {ReadProtected}];
 
-(* --- End "GWPTools`GWPNumerical1D`" --- *)
-If[TrueQ[Global`$GWPDebug], Print["[GWPNumerical1D] EndPackage"]];
+(* --- End "MaddoxScience`GWPTools`GWPNumerical1D`" --- *)
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPNumerical1D] EndPackage"]];
 EndPackage[]

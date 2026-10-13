@@ -9,11 +9,11 @@
 
 
 (* ========================================================================= *)
-(* PACKAGE     : GWPTools`GWPRegistry`                                       *)
+(* PACKAGE     : MaddoxScience`GWPTools`GWPRegistry`                         *)
 (* DESCRIPTION : Tools for property and potential model registration.        *)
 (* ========================================================================= *)
-BeginPackage["GWPTools`GWPRegistry`"]
-If[TrueQ[Global`$GWPDebug], Print["[GWPRegistry] BeginPackage"]];
+BeginPackage["MaddoxScience`GWPTools`GWPRegistry`"]
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPRegistry] BeginPackage"]];
 
 (* --- Usage Statements --- *)
 $GWPRegistry::usage = "$GWPRegistry is a flat list storing the raw registration chunks for all active physical properties.";
@@ -21,7 +21,7 @@ $GWPInformation::usage = "$GWPInformation is a nested Association mapping each e
 $GWPPotentials::usage = "$GWPPotentials is a nested Association mapping each engine type to its registered potential models, including their backend developer symbols, user-facing templates, and categories.";
 
 (* --- Registry Functions --- *)
-GWPRegisterExtension::usage = "GWPRegisterExtension[chunk] parses a formatted list of physical properties (a registry chunk) and injects them into $GWPRegistry and $GWPInformation.";
+GWPRegisterExtension::usage = "GWPRegisterExtension[chunk] parses a formatted list of physical properties (a registry chunk) and injects them into $GWPRegistry and$GWPInformation.";
 GWPRegisterPotentials::usage = "GWPRegisterPotentials[potChunk, type] parses a formatted list of potential models (a potential chunk) and injects them into the unified $GWPPotentials database for the specified engine type.";
 
 (* --- Messages --- *)
@@ -30,7 +30,7 @@ GWPRegisterExtension::badformat = "Invalid property registration chunk format. E
 GWPRegisterPotentials::badformat = "Invalid potential registration chunk format for engine `1`. Expected 4 elements, but received `2`: `3`";
 
 Begin["`Private`"]
-If[TrueQ[Global`$GWPDebug], Print["[GWPRegistry] Begin Private"]];
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPRegistry] Begin Private"]];
 
 
 (* ::Section::Closed:: *)
@@ -43,8 +43,7 @@ If[ValueQ[$GWPRegistry] && Length[$GWPRegistry] > 0,
 ];
 
 (* --- Initialize Registry Lists --- *)
-$GWPRegistry = {};
-$GWPInformation = Association[];
+$GWPRegistry = {};$GWPInformation = Association[];
 
 (* --- Unified Potential Database --- *)
 $GWPPotentials = Association[];
@@ -56,8 +55,7 @@ $GWPPotentials = Association[];
 
 (* --- Property Registration --- *)
 GWPRegisterExtension[registryChunk_List] := Module[{},
-  $GWPRegistry = DeleteDuplicates[Join[$GWPRegistry, registryChunk]];
-  $GWPInformation = Association[];
+  $GWPRegistry = DeleteDuplicates[Join[$GWPRegistry, registryChunk]];$GWPInformation = Association[];
   
   Scan[
     Function[{row},
@@ -65,9 +63,7 @@ GWPRegisterExtension[registryChunk_List] := Module[{},
         Module[{long, short, dyn, stat, cat, type},
           {long, short, dyn, stat, cat, type} = row;
           
-          If[!KeyExistsQ[$GWPInformation, type], $GWPInformation[type] = Association[]];
-          
-          $GWPInformation[type][long] = Association[
+          If[!KeyExistsQ[$GWPInformation, type], $GWPInformation[type] = Association[]];$GWPInformation[type][long] = Association[
             "ShortKey"      -> short,
             "DynamicClass"  -> dyn,
             "StaticClass"   -> stat,
@@ -89,7 +85,7 @@ GWPRegisterExtension[registryChunk_List] := Module[{},
 
 (* --- Potential Model Registration --- *)
 GWPRegisterPotentials[potChunk_List, type_String] := Module[{},
-  If[!KeyExistsQ[$GWPPotentials, type], $GWPPotentials[type] = Association[]];
+  If[!KeyExistsQ[$GWPPotentials, type],$GWPPotentials[type] = Association[]];
   
   Scan[
     Function[{row},
@@ -115,13 +111,13 @@ GWPRegisterPotentials[potChunk_List, type_String] := Module[{},
 (*End*)
 
 
-(* --- End "GWPTools`GWPRegistry`Private`" --- *)
-If[TrueQ[Global`$GWPDebug], Print["[GWPRegistry] End Private"]];
+(* --- End "MaddoxScience`GWPTools`GWPRegistry`Private`" --- *)
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPRegistry] End Private"]];
 End[]
 
 (* Hide internal code for all Developer functions from the ? menu *)
-SetAttributes[Evaluate[Names["GWPTools`GWPRegistry`*"]], {ReadProtected}];
+SetAttributes[Evaluate[Names["MaddoxScience`GWPTools`GWPRegistry`*"]], {ReadProtected}];
 
-(* --- End "GWPTools`GWPRegistry`" --- *)
-If[TrueQ[Global`$GWPDebug], Print["[GWPRegistry] EndPackage"]];
+(* --- End "MaddoxScience`GWPTools`GWPRegistry`" --- *)
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPRegistry] EndPackage"]];
 EndPackage[]

@@ -8,14 +8,14 @@
 (*GWPTools Usage Registration*)
 
 
-BeginPackage["GWPTools`"]
-If[TrueQ[Global`$GWPDebug], Print["[GWPDispatcher] BeginPackage GWPTools"]];
+BeginPackage["MaddoxScience`GWPTools`"]
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPDispatcher] BeginPackage GWPTools"]];
 
 (* --- Usage Statements --- *)
 GWP::usage = "GWP[type][parameters, options] returns a GWPObject representing a Gaussian wavepacket with the specified type, parameters, and options.";
 GWPObject::usage = "GWPObject[...] represents the wavepacket data structure.";
 
-If[TrueQ[Global`$GWPDebug], Print["[GWPDispatcher] EndPackage GWPTools"]];
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPDispatcher] EndPackage GWPTools"]];
 EndPackage[]
 
 
@@ -24,19 +24,19 @@ EndPackage[]
 
 
 (* ========================================================================= *)
-(* PACKAGE     : GWPTools`GWPDispatcher`                                     *)
+(* PACKAGE     : MaddoxScience`GWPTools`GWPDispatcher`                       *)
 (* DESCRIPTION : The core constructor, polymorphic routing engine, and API   *)
 (*               overloads for the GWPTools framework.                       *)
 (* ========================================================================= *)
-BeginPackage["GWPTools`GWPDispatcher`"]
+BeginPackage["MaddoxScience`GWPTools`GWPDispatcher`"]
 
-If[TrueQ[Global`$GWPDebug], Print["[GWPDispatcher] BeginPackage"]];
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPDispatcher] BeginPackage"]];
 
 Begin["`Private`"]
-If[TrueQ[Global`$GWPDebug], Print["[GWPDispatcher] Begin Private"]];
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPDispatcher] Begin Private"]];
 
-Needs["GWPTools`"];
-Needs["GWPTools`GWPRegistry`"];
+Needs["MaddoxScience`GWPTools`"];
+Needs["MaddoxScience`GWPTools`GWPRegistry`"];
 
 
 (* ::Section::Closed:: *)
@@ -135,7 +135,7 @@ GWP[type_String][initialParams___, opts : OptionsPattern[]] /; GWPTypeQ[type] &&
     ];
     
     (* Resolve GWPtypePARAM Function and Options *)
-    paramBuilder = Symbol["GWPTools`GWPDeveloper`GWP" <> type <> "PARAM"];
+    paramBuilder = Symbol["MaddoxScience`GWPTools`GWPDeveloper`GWP" <> type <> "PARAM"];
     filteredOpts = Sequence @@ FilterRules[{opts}, Options[paramBuilder]];
 
         (* Fetch Parameter Sequence from GWPtypePARAM *)
@@ -351,7 +351,7 @@ GWPObject /: MakeBoxes[obj : GWPObject[data_], format_] := Module[
 
   (* Resolve GWPtypeUI Function *)  
   type = data["GWPType"];
-  uiBuilderName = "GWPTools`GWPDeveloper`GWP" <> type <> "UI";
+  uiBuilderName = "MaddoxScience`GWPTools`GWPDeveloper`GWP" <> type <> "UI";
   (* Fetch Format Data from GWPtypeUI *)
   If[NameQ[uiBuilderName],
     uiBuilder = Symbol[uiBuilderName];
@@ -434,91 +434,91 @@ GWPObject::badargs = "Invalid arguments provided for property `1`. Check the exp
 
 (* --- Dynamic Classes (Active Potential) --- *)
 GWPPropertyDispatch["Static", macro_, type_, data_, opts___] := 
-  Symbol["GWPTools`GWPDeveloper`GWP" <> type <> macro][Sequence @@ data["Parameters"], opts];
+  Symbol["MaddoxScience`GWPTools`GWPDeveloper`GWP" <> type <> macro][Sequence @@ data["Parameters"], opts];
 
 GWPPropertyDispatch["Recursive", macro_, type_, data_, n_Integer : 0] /; n >= 0 := 
-  Function[{var, t}, Symbol["GWPTools`GWPDeveloper`GWP" <> type <> macro][n][var][data["PotentialModel"][t][Sequence @@ data["Parameters"]]]];
+  Function[{var, t}, Symbol["MaddoxScience`GWPTools`GWPDeveloper`GWP" <> type <> macro][n][var][data["PotentialModel"][t][Sequence @@ data["Parameters"]]]];
 
 GWPPropertyDispatch["Moment", macro_, type_, data_, n_Integer : 1] /; n >= 0 := 
-  Function[t, Symbol["GWPTools`GWPDeveloper`GWP" <> type <> macro][n][data["PotentialModel"][t][Sequence @@ data["Parameters"]]]];
+  Function[t, Symbol["MaddoxScience`GWPTools`GWPDeveloper`GWP" <> type <> macro][n][data["PotentialModel"][t][Sequence @@ data["Parameters"]]]];
 
 GWPPropertyDispatch["CrossMoment", macro_, type_, data_] := 
-  Function[t, Symbol["GWPTools`GWPDeveloper`GWP" <> type <> macro][data["PotentialModel"][t][Sequence @@ data["Parameters"]]]];
+  Function[t, Symbol["MaddoxScience`GWPTools`GWPDeveloper`GWP" <> type <> macro][data["PotentialModel"][t][Sequence @@ data["Parameters"]]]];
   
 GWPPropertyDispatch["CrossMoment", macro_, type_, data_, m_Integer, n_Integer] /; m >= 0 && n >= 0 := 
-  Function[t, Symbol["GWPTools`GWPDeveloper`GWP" <> type <> macro][m, n][data["PotentialModel"][t][Sequence @@ data["Parameters"]]]];
+  Function[t, Symbol["MaddoxScience`GWPTools`GWPDeveloper`GWP" <> type <> macro][m, n][data["PotentialModel"][t][Sequence @@ data["Parameters"]]]];
 
 GWPPropertyDispatch["Field", macro_, type_, data_] := 
-  Function[{var, t}, Symbol["GWPTools`GWPDeveloper`GWP" <> type <> macro][var][data["PotentialModel"][t][Sequence @@ data["Parameters"]]]];
+  Function[{var, t}, Symbol["MaddoxScience`GWPTools`GWPDeveloper`GWP" <> type <> macro][var][data["PotentialModel"][t][Sequence @@ data["Parameters"]]]];
 
 GWPPropertyDispatch["Bivariate", macro_, type_, data_] := 
-  Function[{v1, v2, t}, Symbol["GWPTools`GWPDeveloper`GWP" <> type <> macro][v1, v2][data["PotentialModel"][t][Sequence @@ data["Parameters"]]]];
+  Function[{v1, v2, t}, Symbol["MaddoxScience`GWPTools`GWPDeveloper`GWP" <> type <> macro][v1, v2][data["PotentialModel"][t][Sequence @@ data["Parameters"]]]];
 
 GWPPropertyDispatch["Temporal", macro_, type_, data_] := 
-  Function[t, Symbol["GWPTools`GWPDeveloper`GWP" <> type <> macro][data["PotentialModel"][t][Sequence @@ data["Parameters"]]]];
+  Function[t, Symbol["MaddoxScience`GWPTools`GWPDeveloper`GWP" <> type <> macro][data["PotentialModel"][t][Sequence @@ data["Parameters"]]]];
   
 GWPPropertyDispatch["ParameterizedBivariate", macro_, type_, data_] := 
-  Function[{v1, v2, t}, Symbol["GWPTools`GWPDeveloper`GWP" <> type <> macro][v1, v2][data["PotentialModel"][t][Sequence @@ data["Parameters"]]]];
+  Function[{v1, v2, t}, Symbol["MaddoxScience`GWPTools`GWPDeveloper`GWP" <> type <> macro][v1, v2][data["PotentialModel"][t][Sequence @@ data["Parameters"]]]];
 
 GWPPropertyDispatch["ParameterizedBivariate", macro_, type_, data_, s_] := 
-  Function[{v1, v2, t}, Symbol["GWPTools`GWPDeveloper`GWP" <> type <> macro][s][v1, v2][data["PotentialModel"][t][Sequence @@ data["Parameters"]]]];
+  Function[{v1, v2, t}, Symbol["MaddoxScience`GWPTools`GWPDeveloper`GWP" <> type <> macro][s][v1, v2][data["PotentialModel"][t][Sequence @@ data["Parameters"]]]];
   
 GWPPropertyDispatch["ParameterizedTemporal", macro_, type_, data_] := 
-  Function[t, Symbol["GWPTools`GWPDeveloper`GWP" <> type <> macro][data["PotentialModel"][t][Sequence @@ data["Parameters"]]]];
+  Function[t, Symbol["MaddoxScience`GWPTools`GWPDeveloper`GWP" <> type <> macro][data["PotentialModel"][t][Sequence @@ data["Parameters"]]]];
 
 GWPPropertyDispatch["ParameterizedTemporal", macro_, type_, data_, s_] := 
-  Function[t, Symbol["GWPTools`GWPDeveloper`GWP" <> type <> macro][s][data["PotentialModel"][t][Sequence @@ data["Parameters"]]]];
+  Function[t, Symbol["MaddoxScience`GWPTools`GWPDeveloper`GWP" <> type <> macro][s][data["PotentialModel"][t][Sequence @@ data["Parameters"]]]];
   
 (* Full Vector Return *)
 GWPPropertyDispatch["BivariateVectorField", macro_, type_, data_] := 
-  Function[{v1, v2, t}, Symbol["GWPTools`GWPDeveloper`GWP" <> type <> macro][v1, v2][data["PotentialModel"][t][Sequence @@ data["Parameters"]]]];
+  Function[{v1, v2, t}, Symbol["MaddoxScience`GWPTools`GWPDeveloper`GWP" <> type <> macro][v1, v2][data["PotentialModel"][t][Sequence @@ data["Parameters"]]]];
 
 (* Indexed Component Return *)
 GWPPropertyDispatch["BivariateVectorField", macro_, type_, data_, c_Integer] := 
-  Function[{v1, v2, t}, Symbol["GWPTools`GWPDeveloper`GWP" <> type <> macro][c][v1, v2][data["PotentialModel"][t][Sequence @@ data["Parameters"]]]];
+  Function[{v1, v2, t}, Symbol["MaddoxScience`GWPTools`GWPDeveloper`GWP" <> type <> macro][c][v1, v2][data["PotentialModel"][t][Sequence @@ data["Parameters"]]]];
 
 
 (* --- Static Classes (Potential -> None) --- *)
 GWPPropertyDispatch["Spatial", macro_, type_, data_] := 
-  Function[{var}, Symbol["GWPTools`GWPDeveloper`GWP" <> type <> macro][var][Sequence @@ data["Parameters"]]];
+  Function[{var}, Symbol["MaddoxScience`GWPTools`GWPDeveloper`GWP" <> type <> macro][var][Sequence @@ data["Parameters"]]];
 
 GWPPropertyDispatch["RecursiveSpatial", macro_, type_, data_, n_Integer : 0] /; n >= 0 := 
-  Function[{var}, Symbol["GWPTools`GWPDeveloper`GWP" <> type <> macro][n][var][Sequence @@ data["Parameters"]]];
+  Function[{var}, Symbol["MaddoxScience`GWPTools`GWPDeveloper`GWP" <> type <> macro][n][var][Sequence @@ data["Parameters"]]];
 
 GWPPropertyDispatch["BivariateSpatial", macro_, type_, data_] := 
-  Function[{var1, var2}, Symbol["GWPTools`GWPDeveloper`GWP" <> type <> macro][var1, var2][Sequence @@ data["Parameters"]]];
+  Function[{var1, var2}, Symbol["MaddoxScience`GWPTools`GWPDeveloper`GWP" <> type <> macro][var1, var2][Sequence @@ data["Parameters"]]];
 
 GWPPropertyDispatch["StaticValue", macro_, type_, data_] := 
-  Symbol["GWPTools`GWPDeveloper`GWP" <> type <> macro][Sequence @@ data["Parameters"]];
+  Symbol["MaddoxScience`GWPTools`GWPDeveloper`GWP" <> type <> macro][Sequence @@ data["Parameters"]];
 
 GWPPropertyDispatch["StaticMoment", macro_, type_, data_, n_Integer : 1] /; n >= 0 := 
-  Symbol["GWPTools`GWPDeveloper`GWP" <> type <> macro][n][Sequence @@ data["Parameters"]];
+  Symbol["MaddoxScience`GWPTools`GWPDeveloper`GWP" <> type <> macro][n][Sequence @@ data["Parameters"]];
 
 GWPPropertyDispatch["StaticCrossMoment", macro_, type_, data_] := 
-  Symbol["GWPTools`GWPDeveloper`GWP" <> type <> macro][Sequence @@ data["Parameters"]];
+  Symbol["MaddoxScience`GWPTools`GWPDeveloper`GWP" <> type <> macro][Sequence @@ data["Parameters"]];
   
 GWPPropertyDispatch["StaticCrossMoment", macro_, type_, data_, m_Integer, n_Integer] /; m >= 0 && n >= 0 := 
-  Symbol["GWPTools`GWPDeveloper`GWP" <> type <> macro][m, n][Sequence @@ data["Parameters"]];
+  Symbol["MaddoxScience`GWPTools`GWPDeveloper`GWP" <> type <> macro][m, n][Sequence @@ data["Parameters"]];
   
 GWPPropertyDispatch["ParameterizedBivariateSpatial", macro_, type_, data_] := 
-  Function[{v1, v2}, Symbol["GWPTools`GWPDeveloper`GWP" <> type <> macro][v1, v2][Sequence @@ data["Parameters"]]];
+  Function[{v1, v2}, Symbol["MaddoxScience`GWPTools`GWPDeveloper`GWP" <> type <> macro][v1, v2][Sequence @@ data["Parameters"]]];
 
 GWPPropertyDispatch["ParameterizedBivariateSpatial", macro_, type_, data_, s_] := 
-  Function[{v1, v2}, Symbol["GWPTools`GWPDeveloper`GWP" <> type <> macro][s][v1, v2][Sequence @@ data["Parameters"]]];
+  Function[{v1, v2}, Symbol["MaddoxScience`GWPTools`GWPDeveloper`GWP" <> type <> macro][s][v1, v2][Sequence @@ data["Parameters"]]];
   
 GWPPropertyDispatch["ParameterizedStaticValue", macro_, type_, data_] := 
-  Symbol["GWPTools`GWPDeveloper`GWP" <> type <> macro][Sequence @@ data["Parameters"]];
+  Symbol["MaddoxScience`GWPTools`GWPDeveloper`GWP" <> type <> macro][Sequence @@ data["Parameters"]];
 
 GWPPropertyDispatch["ParameterizedStaticValue", macro_, type_, data_, s_] := 
-  Symbol["GWPTools`GWPDeveloper`GWP" <> type <> macro][s][Sequence @@ data["Parameters"]];
+  Symbol["MaddoxScience`GWPTools`GWPDeveloper`GWP" <> type <> macro][s][Sequence @@ data["Parameters"]];
   
 (* Full Vector Return *)
 GWPPropertyDispatch["BivariateVectorFieldSpatial", macro_, type_, data_] := 
-  Function[{v1, v2}, Symbol["GWPTools`GWPDeveloper`GWP" <> type <> macro][v1, v2][Sequence @@ data["Parameters"]]];
+  Function[{v1, v2}, Symbol["MaddoxScience`GWPTools`GWPDeveloper`GWP" <> type <> macro][v1, v2][Sequence @@ data["Parameters"]]];
 
 (* Indexed Component Return *)
 GWPPropertyDispatch["BivariateVectorFieldSpatial", macro_, type_, data_, c_Integer] := 
-  Function[{v1, v2}, Symbol["GWPTools`GWPDeveloper`GWP" <> type <> macro][c][v1, v2][Sequence @@ data["Parameters"]]];
+  Function[{v1, v2}, Symbol["MaddoxScience`GWPTools`GWPDeveloper`GWP" <> type <> macro][c][v1, v2][Sequence @@ data["Parameters"]]];
 
 
 (* --- Fallbacks --- *)
@@ -535,16 +535,16 @@ GWPPropertyDispatch[class_, macro_, type_, data_, badArgs___] := (
 (*End*)
 
 
-(* --- End "GWPTools`GWPDispatcher`Private`" --- *)
-If[TrueQ[Global`$GWPDebug], Print["[GWPDispatcher] End Private"]];
+(* --- End "MaddoxScience`GWPTools`GWPDispatcher`Private`" --- *)
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPDispatcher] End Private"]];
 End[]
 
 (* Hide internal code for all Developer functions from the ? menu *)
-SetAttributes[Evaluate[Names["GWPTools`GWPDispatcher`*"]], {ReadProtected}];
+SetAttributes[Evaluate[Names["MaddoxScience`GWPTools`GWPDispatcher`*"]], {ReadProtected}];
 
 SetAttributes[GWP, {ReadProtected}];
 SetAttributes[GWPObject, {ReadProtected}];
 
-(* --- End "GWPTools`GWPDispatcher`" --- *)
-If[TrueQ[Global`$GWPDebug], Print["[GWPDispatcher] EndPackage"]];
+(* --- End "MaddoxScience`GWPTools`GWPDispatcher`" --- *)
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPDispatcher] EndPackage"]];
 EndPackage[]

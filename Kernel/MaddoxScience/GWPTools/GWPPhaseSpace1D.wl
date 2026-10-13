@@ -12,11 +12,11 @@
 (*BeginPackage*)
 
 
-Needs["GWPTools`GWPDeveloper`"];
-BeginPackage["GWPTools`GWPDeveloper`"]
+Needs["MaddoxScience`GWPTools`GWPDeveloper`"];
+BeginPackage["MaddoxScience`GWPTools`GWPDeveloper`"]
 
 
-If[TrueQ[Global`$GWPDebug], Print["[GWPPhaseSpace1D] BeginPackage GWPDeveloper"]];
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPPhaseSpace1D] BeginPackage GWPDeveloper"]];
 
 Off[General::shdw];
 
@@ -41,12 +41,12 @@ GWP1DVONNEUMANN::usage = "GWP1DVONNEUMANN[param] evaluates the von Neumann entro
 
 Off[General::shdw];
 
-If[TrueQ[Global`$GWPDebug], Print["[GWPPhaseSpace1D] EndPackage GWPDeveloper"]];
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPPhaseSpace1D] EndPackage GWPDeveloper"]];
 
 Quiet[EndPackage[], General::shdw]
 
 (* Scrub the Developer context from the global path immediately *)
-$ContextPath = DeleteCases[$ContextPath, "GWPTools`GWPDeveloper`"];
+$ContextPath = DeleteCases[$ContextPath, "MaddoxScience`GWPTools`GWPDeveloper`"];
 
 
 (* ::Section::Closed:: *)
@@ -54,16 +54,16 @@ $ContextPath = DeleteCases[$ContextPath, "GWPTools`GWPDeveloper`"];
 
 
 (* ========================================================================= *)
-(* PACKAGE     : GWPTools`GWPPhaseSpace1D`                                   *)
+(* PACKAGE     : MaddoxScience`GWPTools`GWPPhaseSpace1D`                     *)
 (* DESCRIPTION : 1D Phase space functions for the GWPTools framework.        *)
 (* ========================================================================= *)
-BeginPackage["GWPTools`GWPPhaseSpace1D`"]
-If[TrueQ[Global`$GWPDebug], Print["[GWPPhaseSpace1D] BeginPackage"]];
+BeginPackage["MaddoxScience`GWPTools`GWPPhaseSpace1D`"]
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPPhaseSpace1D] BeginPackage"]];
 Begin["`Private`"]
-If[TrueQ[Global`$GWPDebug], Print["[GWPPhaseSpace1D] Begin Private"]];
-Needs["GWPTools`GWPDeveloper`"];
-Needs["GWPTools`GWPRegistry`"];
-Needs["GWPTools`GWPEngine1D`"];
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPPhaseSpace1D] Begin Private"]];
+Needs["MaddoxScience`GWPTools`GWPDeveloper`"];
+Needs["MaddoxScience`GWPTools`GWPRegistry`"];
+Needs["MaddoxScience`GWPTools`GWPEngine1D`"];
 
 
 (* ::Section::Closed:: *)
@@ -118,7 +118,7 @@ $regPhaseSpace1D = Join[#, {"PhaseSpace", "1D"}] & /@ {
 };
 
 (* Inject into the central registry *)
-GWPTools`GWPRegistry`GWPRegisterExtension[$regPhaseSpace1D];
+MaddoxScience`GWPTools`GWPRegistry`GWPRegisterExtension[$regPhaseSpace1D];
 Clear[$regPhaseSpace1D];
 
 
@@ -126,10 +126,10 @@ Clear[$regPhaseSpace1D];
 (*End*)
 
 
-(* --- End "GWPTools`GWPPhaseSpace1D`Private`" --- *)
-If[TrueQ[Global`$GWPDebug], Print["[GWPPhaseSpace1D] End Private"]];
+(* --- End "MaddoxScience`GWPTools`GWPPhaseSpace1D`Private`" --- *)
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPPhaseSpace1D] End Private"]];
 End[];
-SetAttributes[Evaluate[Names["GWPTools`GWPPhaseSpace1D`*"]], {ReadProtected}];
-(* --- End "GWPTools`GWPPhaseSpace1D`" --- *)
-If[TrueQ[Global`$GWPDebug], Print["[GWPPhaseSpace1D] EndPackage"]];
+SetAttributes[Evaluate[Names["MaddoxScience`GWPTools`GWPPhaseSpace1D`*"]], {ReadProtected}];
+(* --- End "MaddoxScience`GWPTools`GWPPhaseSpace1D`" --- *)
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPPhaseSpace1D] EndPackage"]];
 EndPackage[]

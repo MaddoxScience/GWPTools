@@ -9,18 +9,18 @@
 
 
 (* ========================================================================= *)
-(* PACKAGE     : GWPTools`GWPDiagnostics`                                    *)
+(* PACKAGE     : MaddoxScience`GWPTools`GWPDiagnostics`                      *)
 (* DESCRIPTION : Testing, verification, and formatting suites for the        *)
 (*               GWPTools framework.                                         *)
 (* ========================================================================= *)
 
-BeginPackage["GWPTools`GWPDiagnostics`", {
-  "GWPTools`",
-  "GWPTools`GWPHydrodynamics`",
-  "GWPTools`GWPDeveloper`"
+BeginPackage["MaddoxScience`GWPTools`GWPDiagnostics`", {
+  "MaddoxScience`GWPTools`",
+  "MaddoxScience`GWPTools`GWPHydrodynamics`",
+  "MaddoxScience`GWPTools`GWPDeveloper`"
 }]
 
-If[TrueQ[Global`$GWPDebug], Print["[GWPDiagnostics] BeginPackage"]];
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPDiagnostics] BeginPackage"]];
 
 Off[General::shdw];
 
@@ -42,12 +42,12 @@ GWPFormatReport::usage = "GWPFormatReport[report] formats a TestReportObject int
 
 
 Begin["`Private`"]
-If[TrueQ[Global`$GWPDebug], Print["[GWPDiagnostics] Begin Private"]];
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPDiagnostics] Begin Private"]];
 
 (* Capture Package Directory for test file routing *)
 $PackageDirectory = Quiet[
   If[$InputFileName =!= "", 
-    DirectoryName[$InputFileName, 2], 
+    DirectoryName[$InputFileName, 4], 
     NotebookDirectory[]
   ]
 ];
@@ -182,13 +182,13 @@ GWPFormatReport[reports:{__TestReportObject}, opts:OptionsPattern[]] :=
 (*End*)
 
 
-(* --- End "GWPTools`GWPDiagnostics`Private`" --- *)
-If[TrueQ[Global`$GWPDebug], Print["[GWPDiagnostics] End Private"]];
+(* --- End "MaddoxScience`GWPTools`GWPDiagnostics`Private`" --- *)
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPDiagnostics] End Private"]];
 End[]
 
 (* Hide internal code from the ? menu *)
-SetAttributes[Evaluate[Names["GWPTools`GWPDiagnostics`*"]], {ReadProtected}];
+SetAttributes[Evaluate[Names["MaddoxScience`GWPTools`GWPDiagnostics`*"]], {ReadProtected}];
 
-(* --- End "GWPTools`GWPDiagnostics`" --- *)
-If[TrueQ[Global`$GWPDebug], Print["[GWPDiagnostics] EndPackage"]];
+(* --- End "MaddoxScience`GWPTools`GWPDiagnostics`" --- *)
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPDiagnostics] EndPackage"]];
 Quiet[EndPackage[], General::shdw]

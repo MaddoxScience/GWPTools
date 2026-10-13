@@ -8,7 +8,7 @@
 (* ========================================================================= *)
 
 (* Load the Master Test Environment *)
-Needs["GWPTools`GWPDiagnostics`"]
+Needs["MaddoxScience`GWPTools`GWPDiagnostics`"]
 
 (* ========================================================== *)
 (* DISPATCH VERIFICATION SETUP                                *)
@@ -32,7 +32,7 @@ VerificationTest[True, TestID -> "Definition", MetaInformation -> "ARG=" <> argT
 VerificationTest[Head[OBJD] === GWPObject, TestID -> "GWPDISP-00-DefOBJ-" <> sysTag, MetaInformation -> STRD]
 VerificationTest[Head[OBJS] === GWPObject, TestID -> "GWPDISP-00-DefOBJ-NONE", MetaInformation -> STRS]
 
-reg1D = Select[GWPTools`GWPRegistry`$GWPRegistry, MemberQ[#, "1D"] &];
+reg1D = Select[MaddoxScience`GWPTools`GWPRegistry`$GWPRegistry, MemberQ[#, "1D"] &];
 
 (* ========================================================== *)
 (* DYNAMIC & STATIC VERIFICATION TESTS                        *)

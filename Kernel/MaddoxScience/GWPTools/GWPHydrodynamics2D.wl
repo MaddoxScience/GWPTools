@@ -12,9 +12,9 @@
 (*BeginPackage*)
 
 
-Needs["GWPTools`GWPDeveloper`"];
-BeginPackage["GWPTools`GWPDeveloper`"]
-If[TrueQ[Global`$GWPDebug], Print["[GWPHydrodynamics2D] BeginPackage GWPDeveloper"]];
+Needs["MaddoxScience`GWPTools`GWPDeveloper`"];
+BeginPackage["MaddoxScience`GWPTools`GWPDeveloper`"]
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPHydrodynamics2D] BeginPackage GWPDeveloper"]];
 Off[General::shdw];
 
 
@@ -51,9 +51,9 @@ GWP2DXC::usage = "GWP2DXC[cr, ct][param] evaluates the full 2D C-space trajector
 
 
 Off[General::shdw];
-If[TrueQ[Global`$GWPDebug], Print["[GWPHydrodynamics2D] EndPackage GWPDeveloper"]];
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPHydrodynamics2D] EndPackage GWPDeveloper"]];
 Quiet[EndPackage[], General::shdw]
-$ContextPath = DeleteCases[$ContextPath, "GWPTools`GWPDeveloper`"];
+$ContextPath = DeleteCases[$ContextPath, "MaddoxScience`GWPTools`GWPDeveloper`"];
 
 
 
@@ -62,17 +62,17 @@ $ContextPath = DeleteCases[$ContextPath, "GWPTools`GWPDeveloper`"];
 
 
 (* ========================================================================= *)
-(* PACKAGE     : GWPTools`GWPHydrodynamics2D`                                *)
+(* PACKAGE     : MaddoxScience`GWPTools`GWPHydrodynamics2D`                  *)
 (* DESCRIPTION : 2D Quantum fluid dynamics and Bohmian trajectories          *)
 (* ========================================================================= *)
-BeginPackage["GWPTools`GWPHydrodynamics2D`"]
-If[TrueQ[Global`$GWPDebug], Print["[GWPHydrodynamics2D] BeginPackage"]];
+BeginPackage["MaddoxScience`GWPTools`GWPHydrodynamics2D`"]
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPHydrodynamics2D] BeginPackage"]];
 Begin["`Private`"]
-If[TrueQ[Global`$GWPDebug], Print["[GWPHydrodynamics2D] Begin Private"]];
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPHydrodynamics2D] Begin Private"]];
 
-Needs["GWPTools`GWPDeveloper`"];
-Needs["GWPTools`GWPRegistry`"];
-Needs["GWPTools`GWPEngine2D`"];
+Needs["MaddoxScience`GWPTools`GWPDeveloper`"];
+Needs["MaddoxScience`GWPTools`GWPRegistry`"];
+Needs["MaddoxScience`GWPTools`GWPEngine2D`"];
 
 
 
@@ -171,7 +171,7 @@ $regTraj2D = Join[#, {"BohmianTrajectories", "2D"}] & /@ {
 };
 
 (* Register the new fields *)
-GWPTools`GWPRegistry`GWPRegisterExtension[Join[$regHydroX2D,$regTraj2D]];
+MaddoxScience`GWPTools`GWPRegistry`GWPRegisterExtension[Join[$regHydroX2D,$regTraj2D]];
 
 (* Clean up temporary registry variables *)
 Clear[$regHydroX2D,$regTraj2D];
@@ -182,12 +182,12 @@ Clear[$regHydroX2D,$regTraj2D];
 (*End*)
 
 
-(* --- End "GWPTools`GWPHydrodynamics2D`Private`" --- *)
-If[TrueQ[Global`$GWPDebug], Print["[GWPHydrodynamics2D] End Private"]];
+(* --- End "MaddoxScience`GWPTools`GWPHydrodynamics2D`Private`" --- *)
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPHydrodynamics2D] End Private"]];
 End[]
 
-SetAttributes[Evaluate[Names["GWPTools`GWPHydrodynamics2D`*"]], {ReadProtected}];
+SetAttributes[Evaluate[Names["MaddoxScience`GWPTools`GWPHydrodynamics2D`*"]], {ReadProtected}];
 
-(* --- End "GWPTools`GWPHydrodynamics2D`" --- *)
-If[TrueQ[Global`$GWPDebug], Print["[GWPHydrodynamics2D] EndPackage"]];
+(* --- End "MaddoxScience`GWPTools`GWPHydrodynamics2D`" --- *)
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPHydrodynamics2D] EndPackage"]];
 EndPackage[]

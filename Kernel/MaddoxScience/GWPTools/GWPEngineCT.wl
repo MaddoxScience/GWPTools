@@ -1,10 +1,12 @@
+(* ::Package:: *)
+
 (* ========================================================================= *)
 (* Usage Registration (Symbol Hoisting)                                      *)
 (* ========================================================================= *)
-Needs["GWPTools`GWPDeveloper`"];
-BeginPackage["GWPTools`GWPDeveloper`"]
+Needs["MaddoxScience`GWPTools`GWPDeveloper`"];
+BeginPackage["MaddoxScience`GWPTools`GWPDeveloper`"]
 
-If[TrueQ[Global`$GWPDebug], Print["[GWPEngineCT] BeginPackage GWPDeveloper"]];
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPEngineCT] BeginPackage GWPDeveloper"]];
 
 (* Suppress shadowing warnings during the silent boot sequence *)
 Off[General::shdw];
@@ -27,23 +29,23 @@ GWPCTTE::usage = "Evaluates the classical total energy.";
 GWPCTFREE::usage     = "Propagator for a classical free particle.";
 GWPCTHARMONIC::usage = "Propagator for a classical harmonic oscillator.";
 
-If[TrueQ[Global`$GWPDebug], Print["[GWPEngineCT] EndPackage GWPDeveloper"]];
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPEngineCT] EndPackage GWPDeveloper"]];
 
 Quiet[EndPackage[], General::shdw]
-$ContextPath = DeleteCases[$ContextPath, "GWPTools`GWPDeveloper`"];
+$ContextPath = DeleteCases[$ContextPath, "MaddoxScience`GWPTools`GWPDeveloper`"];
 
 
 (* ========================================================================= *)
 (* Private Engine Logic & Registration                                       *)
 (* ========================================================================= *)
-BeginPackage["GWPTools`GWPEngineCT`"];
-If[TrueQ[Global`$GWPDebug], Print["[GWPEngineCT] BeginPackage"]];
+BeginPackage["MaddoxScience`GWPTools`GWPEngineCT`"];
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPEngineCT] BeginPackage"]];
 
 Begin["`Private`"];
-If[TrueQ[Global`$GWPDebug], Print["[GWPEngineCT] Begin Private"]];
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPEngineCT] Begin Private"]];
 
-Needs["GWPTools`GWPDeveloper`"];
-Needs["GWPTools`GWPRegistry`"];
+Needs["MaddoxScience`GWPTools`GWPDeveloper`"];
+Needs["MaddoxScience`GWPTools`GWPRegistry`"];
 
 (* --- Parameter Bus Definition --- *)
 GWPCTARG = Sequence[RX_, RP_, MASS_, {V0_, V1_, V2_}, INIT_];
@@ -100,7 +102,7 @@ $ctReg = {
   {"TotalEnergy",     "TE", "Temporal", "StaticValue", "Energies",   "CT"}
 };
 
-GWPRegisterExtension[$ctReg];
+MaddoxScience`GWPTools`GWPRegistry`GWPRegisterExtension[$ctReg];
 Clear[$ctReg];
 
 (* Format: {StringName, BackendSymbol, Template, Category} *)
@@ -109,14 +111,17 @@ $ctPot = {
   {"Harmonic", GWPCTHARMONIC, "{\"Harmonic\", OMEGA}", "Parameterized"}
 };
 
-GWPRegisterPotentials[$ctPot, "CT"];
+MaddoxScience`GWPTools`GWPRegistry`GWPRegisterPotentials[$ctPot, "CT"];
 Clear[$ctPot];
 
-If[TrueQ[Global`$GWPDebug], Print["[GWPEngineCT] End Private"]];
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPEngineCT] End Private"]];
 End[];
 
 (* Hide internal code for all Developer functions from the ? menu *)
-SetAttributes[Evaluate[Names["GWPTools`GWPEngineCT`*"]], {ReadProtected}];
+SetAttributes[Evaluate[Names["MaddoxScience`GWPTools`GWPEngineCT`*"]], {ReadProtected}];
 
-If[TrueQ[Global`$GWPDebug], Print["[GWPEngineCT] EndPackage"]];
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPEngineCT] EndPackage"]];
 EndPackage[];
+
+(* Scrub backend context to keep the user namespace pristine *)
+$ContextPath = DeleteCases[$ContextPath, "MaddoxScience`GWPTools`GWPEngineCT`"];

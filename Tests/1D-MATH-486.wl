@@ -7,7 +7,7 @@
 (* ========================================================================= *)
 
 (* Load the Master Test Environment *)
-Needs["GWPTools`GWPDiagnostics`"]
+Needs["MaddoxScience`GWPTools`GWPDiagnostics`"]
 
 (* ========================================================== *)
 (* DEFINITIONS AND METADATA STRINGS                           *)

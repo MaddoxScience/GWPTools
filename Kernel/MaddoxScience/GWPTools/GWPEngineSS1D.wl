@@ -12,11 +12,11 @@
 (*BeginPackage*)
 
 
-Needs["GWPTools`GWPDeveloper`"]
-BeginPackage["GWPTools`GWPDeveloper`"]
+Needs["MaddoxScience`GWPTools`GWPDeveloper`"]
+BeginPackage["MaddoxScience`GWPTools`GWPDeveloper`"]
 
 
-If[TrueQ[Global`$GWPDebug], Print["[GWPEngineSS1D] BeginPackage GWPDeveloper"]];
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPEngineSS1D] BeginPackage GWPDeveloper"]];
 
 Off[General::shdw];
 
@@ -82,12 +82,12 @@ GWPSS1DFHONON::usage = "GWPSS1DFHONON[OMEGA, AK, OMEGA1][t][param] evaluates the
 
 Off[General::shdw];
 
-If[TrueQ[Global`$GWPDebug], Print["[GWPEngineSS1D] EndPackage GWPDeveloper"]];
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPEngineSS1D] EndPackage GWPDeveloper"]];
 
 Quiet[EndPackage[], General::shdw]
 
 (* Scrub the Developer context from the global path immediately *)
-$ContextPath = DeleteCases[$ContextPath, "GWPTools`GWPDeveloper`"];
+$ContextPath = DeleteCases[$ContextPath, "MaddoxScience`GWPTools`GWPDeveloper`"];
 
 
 (* ::Section::Closed:: *)
@@ -95,19 +95,19 @@ $ContextPath = DeleteCases[$ContextPath, "GWPTools`GWPDeveloper`"];
 
 
 (* ========================================================================= *)
-(* PACKAGE     : GWPTools`GWPEngineSS1D`                                     *)
+(* PACKAGE     : MaddoxScience`GWPTools`GWPEngineSS1D`                       *)
 (* DESCRIPTION : 1D Superposition of GWPs for the GWPTools framework.        *)
 (* ========================================================================= *)
-BeginPackage["GWPTools`GWPEngineSS1D`"]
-If[TrueQ[Global`$GWPDebug], Print["[GWPEngineSS1D] BeginPackage"]];
+BeginPackage["MaddoxScience`GWPTools`GWPEngineSS1D`"]
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPEngineSS1D] BeginPackage"]];
 Begin["`Private`"]
-If[TrueQ[Global`$GWPDebug], Print["[GWPEngineSS1D] Begin Private"]];
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPEngineSS1D] Begin Private"]];
 (* LOAD DEPENDENCIES INTERNALLY *)
-Needs["GWPTools`GWPEngine1D`"];
+Needs["MaddoxScience`GWPTools`GWPEngine1D`"];
 
 (* ALWAYS LOAD THESE LAST *)
-Needs["GWPTools`GWPDeveloper`"];
-Needs["GWPTools`GWPRegistry`"];
+Needs["MaddoxScience`GWPTools`GWPDeveloper`"];
+Needs["MaddoxScience`GWPTools`GWPRegistry`"];
 
 
 (* ::Section::Closed:: *)
@@ -266,7 +266,7 @@ $potentialsSS1D = {
   {"NonResonantForcedHO", GWPSS1DFHONON,    "{\"NonResonantForcedHO\", OMEGA, AK, OMEGA1}", "Parameterized"}
 };
 
-GWPTools`GWPRegistry`GWPRegisterPotentials[$potentialsSS1D, "SS1D"];
+MaddoxScience`GWPTools`GWPRegistry`GWPRegisterPotentials[$potentialsSS1D, "SS1D"];
 Clear[$potentialsSS1D];
 
 
@@ -290,10 +290,10 @@ $regProbSS1D = Join[#, {"Probabilities", "SS1D"}] & /@ {
 
 
 (* --- Registry Assembly --- *)
-$regSS1D = Join[$regStaticSS1D, $regWaveSS1D, $regProbSS1D];
-Clear[$regStaticSS1D, $regWaveSS1D, $regProbSS1D];
+$regSS1D = Join[$regStaticSS1D, $regWaveSS1D,$regProbSS1D];
+Clear[$regStaticSS1D, $regWaveSS1D,$regProbSS1D];
 
-GWPTools`GWPRegistry`GWPRegisterExtension[$regSS1D];
+MaddoxScience`GWPTools`GWPRegistry`GWPRegisterExtension[$regSS1D];
 Clear[$regSS1D];
 
 
@@ -312,7 +312,7 @@ Opacity[1],Thickness[0.04],Darker@Blue,
 Line[Table[{x,Exp[-15 (x+0.3)^2]-Exp[-15 (x-0.3)^2]},{x,-1,1,0.025}]]},
 ImageSize->32,PlotRange->{{-1,1},{-1.1,1.1}},AspectRatio->1];
 
-GWPTools`GWPDeveloper`GWPSS1DUI[data_] := Module[
+MaddoxScience`GWPTools`GWPDeveloper`GWPSS1DUI[data_] := Module[
   {potDisplay, paramsList, h, m, rc, ic, visible, hidden},
   
   potDisplay = data["Potential"];
@@ -346,14 +346,17 @@ GWPTools`GWPDeveloper`GWPSS1DUI[data_] := Module[
 (*End*)
 
 
-(* --- End "GWPTools`GWPEngineSS1D`Private`" --- *)
+(* --- End "MaddoxScience`GWPTools`GWPEngineSS1D`Private`" --- *)
 
-If[TrueQ[Global`$GWPDebug], Print["[GWPEngineSS1D] End Private"]];
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPEngineSS1D] End Private"]];
 End[]
 
 (* Hide internal code for all Developer functions from the ? menu *)
-SetAttributes[Evaluate[Names["GWPTools`GWPEngineSS1D`*"]], {ReadProtected}];
+SetAttributes[Evaluate[Names["MaddoxScience`GWPTools`GWPEngineSS1D`*"]], {ReadProtected}];
 
-(* --- End "GWPTools`GWPEngineSS1D`" --- *)
-If[TrueQ[Global`$GWPDebug], Print["[GWPEngineSS1D] EndPackage"]];
+(* --- End "MaddoxScience`GWPTools`GWPEngineSS1D`" --- *)
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPEngineSS1D] EndPackage"]];
 EndPackage[]
+
+(* Scrub backend context to keep the user namespace pristine *)
+$ContextPath = DeleteCases[$ContextPath, "MaddoxScience`GWPTools`GWPEngineSS1D`"];

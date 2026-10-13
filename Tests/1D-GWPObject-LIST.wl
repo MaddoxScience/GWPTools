@@ -8,7 +8,7 @@
 (* ========================================================================= *)
 
 (* Load the Master Test Environment *)
-Needs["GWPTools`GWPDiagnostics`"]
+Needs["MaddoxScience`GWPTools`GWPDiagnostics`"]
 
 (* ========================================================== *)
 (* INITIALIZATION                                             *)
@@ -41,7 +41,7 @@ shortKeys = OBJ["ShortKeys"];
 (* ========================================================== *)
 
 (* Pull the full 1D dictionary directly from the backend registry *)
-infoDict1D = GWPTools`GWPRegistry`$GWPInformation["1D"];
+infoDict1D = MaddoxScience`GWPTools`GWPRegistry`$GWPInformation["1D"];
 
 automatedListTests = Flatten @ KeyValueMap[
   Function[{longName, infoMap},

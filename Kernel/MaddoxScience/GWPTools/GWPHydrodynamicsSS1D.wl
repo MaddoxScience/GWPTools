@@ -12,10 +12,10 @@
 (*BeginPackage*)
 
 
-Needs["GWPTools`GWPDeveloper`"];
-BeginPackage["GWPTools`GWPDeveloper`"]
+Needs["MaddoxScience`GWPTools`GWPDeveloper`"];
+BeginPackage["MaddoxScience`GWPTools`GWPDeveloper`"]
 
-If[TrueQ[Global`$GWPDebug], Print["[GWPHydrodynamicsSS1D] BeginPackage GWPDeveloper"]];
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPHydrodynamicsSS1D] BeginPackage GWPDeveloper"]];
 
 Off[General::shdw];
 
@@ -37,12 +37,12 @@ GWPSS1DVX::usage = "GWPSS1DVX[x][param] evaluates the x-space velocity flow fiel
 
 Off[General::shdw];
 
-If[TrueQ[Global`$GWPDebug], Print["[GWPHydrodynamicsSS1D] EndPackage GWPDeveloper"]];
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPHydrodynamicsSS1D] EndPackage GWPDeveloper"]];
 
 Quiet[EndPackage[], General::shdw]
 
 (* Scrub the Developer context from the global path immediately *)
-$ContextPath = DeleteCases[$ContextPath, "GWPTools`GWPDeveloper`"];
+$ContextPath = DeleteCases[$ContextPath, "MaddoxScience`GWPTools`GWPDeveloper`"];
 
 
 (* ::Section::Closed:: *)
@@ -50,19 +50,19 @@ $ContextPath = DeleteCases[$ContextPath, "GWPTools`GWPDeveloper`"];
 
 
 (* ========================================================================= *)
-(* PACKAGE     : GWPTools`GWPHydrodynamicsSS1D`                              *)
+(* PACKAGE     : MaddoxScience`GWPTools`GWPHydrodynamicsSS1D`                *)
 (* DESCRIPTION : SS1D Quantum fluid dynamics and Bohmian trajectories for    *)
 (*               the GWPTools framework.                                     *)
 (* ========================================================================= *)
-BeginPackage["GWPTools`GWPHydrodynamicsSS1D`"]
-If[TrueQ[Global`$GWPDebug], Print["[GWPHydrodynamicsSS1D] BeginPackage"]];
+BeginPackage["MaddoxScience`GWPTools`GWPHydrodynamicsSS1D`"]
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPHydrodynamicsSS1D] BeginPackage"]];
 Begin["`Private`"]
-If[TrueQ[Global`$GWPDebug], Print["[GWPHydrodynamicsSS1D] Begin Private"]];
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPHydrodynamicsSS1D] Begin Private"]];
 
-Needs["GWPTools`GWPDeveloper`"];
-Needs["GWPTools`GWPRegistry`"];
-Needs["GWPTools`GWPEngine1D`"];
-Needs["GWPTools`GWPEngineSS1D`"];
+Needs["MaddoxScience`GWPTools`GWPDeveloper`"];
+Needs["MaddoxScience`GWPTools`GWPRegistry`"];
+Needs["MaddoxScience`GWPTools`GWPEngine1D`"];
+Needs["MaddoxScience`GWPTools`GWPEngineSS1D`"];
 
 
 
@@ -137,7 +137,7 @@ $regHydroXSS1D = Join[#, {"HydrodynamicsX", "SS1D"}] & /@ {
 };
 
 (* Inject into the central registry *)
-GWPTools`GWPRegistry`GWPRegisterExtension[$regHydroXSS1D];
+MaddoxScience`GWPTools`GWPRegistry`GWPRegisterExtension[$regHydroXSS1D];
 Clear[$regHydroXSS1D];
 
 
@@ -145,13 +145,13 @@ Clear[$regHydroXSS1D];
 (*End*)
 
 
-(* --- End "GWPTools`GWPHydrodynamicsSS1D`Private`" --- *)
-If[TrueQ[Global`$GWPDebug], Print["[GWPHydrodynamicsSS1D] End Private"]];
+(* --- End "MaddoxScience`GWPTools`GWPHydrodynamicsSS1D`Private`" --- *)
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPHydrodynamicsSS1D] End Private"]];
 End[];
 
 (* Hide internal code for all Developer functions from the ? menu *)
-SetAttributes[Evaluate[Names["GWPTools`GWPHydrodynamicsSS1D`*"]], {ReadProtected}];
+SetAttributes[Evaluate[Names["MaddoxScience`GWPTools`GWPHydrodynamicsSS1D`*"]], {ReadProtected}];
 
-(* --- End "GWPTools`GWPHydrodynamicsSS1D" --- *)
-If[TrueQ[Global`$GWPDebug], Print["[GWPHydrodynamicsSS1D] EndPackage"]];
+(* --- End "MaddoxScience`GWPTools`GWPHydrodynamicsSS1D" --- *)
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPHydrodynamicsSS1D] EndPackage"]];
 EndPackage[]

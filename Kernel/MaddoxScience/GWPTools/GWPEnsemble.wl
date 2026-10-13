@@ -8,15 +8,15 @@
 (*GWPTools Usage Declaration*)
 
 
-BeginPackage["GWPTools`"]
-If[TrueQ[Global`$GWPDebug], Print["[GWPEnsemble] BeginPackage GWPTools"]];
+BeginPackage["MaddoxScience`GWPTools`"]
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPEnsemble] BeginPackage GWPTools"]];
 
 GWPEnsemble::usage = "GWPEnsemble[GWPObject[], options] generates a structured phase-space or coordinate ensemble for the given wavepacket.";
 
 (* --- Messages --- *)
 GWPEnsemble::badtype = "Unrecognized GWPType: `1`. The corresponding hydrodynamics extension may not be loaded.";
 
-If[TrueQ[Global`$GWPDebug], Print["[GWPEnsemble] EndPackage GWPTools"]];
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPEnsemble] EndPackage GWPTools"]];
 EndPackage[]
 
 
@@ -24,9 +24,9 @@ EndPackage[]
 (*GWPDeveloper Usage Declaration*)
 
 
-Needs["GWPTools`GWPDeveloper`"];
-BeginPackage["GWPTools`GWPDeveloper`"]
-If[TrueQ[Global`$GWPDebug], Print["[GWPEnsemble] BeginPackage GWPDeveloper"]];
+Needs["MaddoxScience`GWPTools`GWPDeveloper`"];
+BeginPackage["MaddoxScience`GWPTools`GWPDeveloper`"]
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPEnsemble] BeginPackage GWPDeveloper"]];
 Off[General::shdw];
 
 GWP1DENSEMBLE::usage = "GWP1DENSEMBLE[method, opts][param] generates a structured phase-space or coordinate ensemble using the evaluated 1D parameter sequence.";
@@ -41,9 +41,9 @@ GWPMC1DENSEMBLE::badmethod = "Unrecognized sampling method `1` for the `2` engin
 GWP2DENSEMBLE::usage = "GWP2DENSEMBLE[method, opts][param] generates a structured phase-space or coordinate ensemble using the evaluated 2D parameter sequence.";
 GWP2DENSEMBLE::badmethod = "Unrecognized sampling method `1` for the `2` engine.";
 
-If[TrueQ[Global`$GWPDebug], Print["[GWPEnsemble] EndPackage GWPDeveloper"]];
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPEnsemble] EndPackage GWPDeveloper"]];
 Quiet[EndPackage[], General::shdw]
-$ContextPath = DeleteCases[$ContextPath, "GWPTools`GWPDeveloper`"];
+$ContextPath = DeleteCases[$ContextPath, "MaddoxScience`GWPTools`GWPDeveloper`"];
 
 
 (* ::Section::Closed:: *)
@@ -51,28 +51,28 @@ $ContextPath = DeleteCases[$ContextPath, "GWPTools`GWPDeveloper`"];
 
 
 (* ========================================================================= *)
-(* PACKAGE     : GWPTools`GWPEnsemble`                                       *)
+(* PACKAGE     : MaddoxScience`GWPTools`GWPEnsemble`                         *)
 (* DESCRIPTION : Standalone ensemble generation for GWPTools frameworks.     *)
 (* ========================================================================= *)
-BeginPackage["GWPTools`GWPEnsemble`"]
-If[TrueQ[Global`$GWPDebug], Print["[GWPEnsemble] BeginPackage"]];
+BeginPackage["MaddoxScience`GWPTools`GWPEnsemble`", {"MaddoxScience`GWPTools`"}]
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPEnsemble] BeginPackage"]];
 Begin["`Private`"]
-If[TrueQ[Global`$GWPDebug], Print["[GWPEnsemble] Begin Private"]];
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPEnsemble] Begin Private"]];
 
-Needs["GWPTools`GWPDeveloper`"];
-Needs["GWPTools`GWPRegistry`"];
+Needs["MaddoxScience`GWPTools`GWPDeveloper`"];
+Needs["MaddoxScience`GWPTools`GWPRegistry`"];
 
 (* Load Engine Dependencies *)
-Needs["GWPTools`GWPEngine1D`"];
-Needs["GWPTools`GWPEngineSS1D`"];
-Needs["GWPTools`GWPEngineMC1D`"];
-Needs["GWPTools`GWPEngine2D`"];
+Needs["MaddoxScience`GWPTools`GWPEngine1D`"];
+Needs["MaddoxScience`GWPTools`GWPEngineSS1D`"];
+Needs["MaddoxScience`GWPTools`GWPEngineMC1D`"];
+Needs["MaddoxScience`GWPTools`GWPEngine2D`"];
 
 (* Load Hydrodynamics Dependencies (required for density and trajectory fields) *)
-Needs["GWPTools`GWPHydrodynamics1D`"];
-Needs["GWPTools`GWPHydrodynamicsSS1D`"];
-Needs["GWPTools`GWPHydrodynamicsMC1D`"];
-Needs["GWPTools`GWPHydrodynamics2D`"];
+Needs["MaddoxScience`GWPTools`GWPHydrodynamics1D`"];
+Needs["MaddoxScience`GWPTools`GWPHydrodynamicsSS1D`"];
+Needs["MaddoxScience`GWPTools`GWPHydrodynamicsMC1D`"];
+Needs["MaddoxScience`GWPTools`GWPHydrodynamics2D`"];
 
 
 (* ::Section::Closed:: *)
@@ -84,7 +84,7 @@ Options[GWPEnsemble] = {
   "Time" -> 0
 };
 
-GWPEnsemble[obj_GWPTools`GWPObject, opts:OptionsPattern[]] := Module[
+GWPEnsemble[obj_MaddoxScience`GWPTools`GWPObject, opts:OptionsPattern[]] := Module[
   {type, method, t0, params, pot, evalParamsList},
   
   type = obj["GWPType"];
@@ -600,13 +600,16 @@ With[{VAL = GWP2DVAL},
 (*End*)
 
 
-(* --- End "GWPTools`GWPEnsemble`Private`" --- *)
-If[TrueQ[Global`$GWPDebug], Print["[GWPEnsemble] End Private"]];
+(* --- End "MaddoxScience`GWPTools`GWPEnsemble`Private`" --- *)
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPEnsemble] End Private"]];
 End[]
 
 (* Hide internal code for all Developer functions from the ? menu *)
-SetAttributes[Evaluate[Names["GWPTools`GWPEnsemble`*"]], {ReadProtected}];
+SetAttributes[Evaluate[Names["MaddoxScience`GWPTools`GWPEnsemble`*"]], {ReadProtected}];
 
-(* --- End "GWPTools`GWPEnsemble`" --- *)
-If[TrueQ[Global`$GWPDebug], Print["[GWPEnsemble] EndPackage"]];
+(* --- End "MaddoxScience`GWPTools`GWPEnsemble`" --- *)
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPEnsemble] EndPackage"]];
 EndPackage[]
+
+(* Scrub backend context to keep the user namespace pristine *)
+$ContextPath = DeleteCases[$ContextPath, "MaddoxScience`GWPTools`GWPEnsemble`"];

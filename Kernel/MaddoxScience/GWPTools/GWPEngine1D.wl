@@ -13,10 +13,10 @@
 
 
 (* --- Hoist Usage Statements into the Developer Context --- *)
-Needs["GWPTools`GWPDeveloper`"];
-BeginPackage["GWPTools`GWPDeveloper`"]
+Needs["MaddoxScience`GWPTools`GWPDeveloper`"];
+BeginPackage["MaddoxScience`GWPTools`GWPDeveloper`"]
 
-If[TrueQ[Global`$GWPDebug], Print["[GWPEngine1D] BeginPackage GWPDeveloper"]];
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPEngine1D] BeginPackage GWPDeveloper"]];
 
 Off[General::shdw];
 
@@ -233,12 +233,12 @@ GWP1DUTE::usage = "GWP1DUTE[param] evaluates the total energy uncertainty.";
 
 Off[General::shdw];
 
-If[TrueQ[Global`$GWPDebug], Print["[GWPEngine1D] EndPackage GWPDeveloper"]];
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPEngine1D] EndPackage GWPDeveloper"]];
 
 Quiet[EndPackage[], General::shdw]
 
 (* Scrub the Developer context from the global path immediately *)
-$ContextPath = DeleteCases[$ContextPath, "GWPTools`GWPDeveloper`"];
+$ContextPath = DeleteCases[$ContextPath, "MaddoxScience`GWPTools`GWPDeveloper`"];
 
 
 (* ::Section::Closed:: *)
@@ -246,20 +246,20 @@ $ContextPath = DeleteCases[$ContextPath, "GWPTools`GWPDeveloper`"];
 
 
 (* ========================================================================= *)
-(* PACKAGE     : GWPTools`GWPEngine1D`                                       *)
+(* PACKAGE     : MaddoxScience`GWPTools`GWPEngine1D`                         *)
 (* DESCRIPTION : The core mathematical engine for 1D generalized Gaussian    *)
 (*               wavepackets.                                                *)
 (* ========================================================================= *)
 
 (* --- Open the Actual Engine Package --- *)
-BeginPackage["GWPTools`GWPEngine1D`"]
-If[TrueQ[Global`$GWPDebug], Print["[GWPEngine1D] BeginPackage"]];
+BeginPackage["MaddoxScience`GWPTools`GWPEngine1D`"]
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPEngine1D] BeginPackage"]];
 
 Begin["`Private`"]
-If[TrueQ[Global`$GWPDebug], Print["[GWPEngine1D] Begin Private"]];
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPEngine1D] Begin Private"]];
 
-Needs["GWPTools`GWPDeveloper`"];
-Needs["GWPTools`GWPRegistry`"];
+Needs["MaddoxScience`GWPTools`GWPDeveloper`"];
+Needs["MaddoxScience`GWPTools`GWPRegistry`"];
 
 
 (* ::Section::Closed:: *)
@@ -415,13 +415,13 @@ GWP1DSHAPE[A1_, HBAR_, MASS_] := Replace[A1, {
   alpha_?GWPScalarQ :> ComplexExpand @ ReIm @ alpha,
   
   (* Catch everything else (including nested lists) *)
-  bad_ :> (Message[GWP1DSHAPE::badform, bad]; {$Failed, $Failed})
+  bad_ :> (Message[GWP1DSHAPE::badform, bad]; {$Failed,$Failed})
 }]
 
 (* --- Position Parser --- *)
 GWP1DPOSITION[X1_] := Replace[X1, {
   x_?GWPScalarQ :> ComplexExpand @ ReIm @ x,
-  bad_ :> (Message[GWP1DPOSITION::badform, bad]; {$Failed, $Failed})
+  bad_ :> (Message[GWP1DPOSITION::badform, bad]; {$Failed,$Failed})
 }]
 
 (* --- Momentum Parser --- *)
@@ -430,7 +430,7 @@ GWP1DMOMENTUM[P1_, MASS_] := Replace[P1, {
     {Sign[sign] * Sqrt[2 * MASS * ek], 0},
   
   p_?GWPScalarQ :> ComplexExpand @ ReIm @ p,
-  bad_ :> (Message[GWP1DMOMENTUM::badform, bad]; {$Failed, $Failed})
+  bad_ :> (Message[GWP1DMOMENTUM::badform, bad]; {$Failed,$Failed})
 }]
 
 (* --- Phase Parser --- *)
@@ -451,7 +451,7 @@ GWP1DPHASE[G1_, HBAR_, RA_, RX_, RP_] := Replace[G1, {
     {-en * t, 0},
     
   gamma_?GWPScalarQ :> ComplexExpand @ ReIm @ gamma,
-  bad_ :> (Message[GWP1DPHASE::badform, bad]; {$Failed, $Failed})
+  bad_ :> (Message[GWP1DPHASE::badform, bad]; {$Failed,$Failed})
 }]
 
 
@@ -1143,7 +1143,7 @@ $potentials1D = {
 };
 
 
-GWPTools`GWPRegistry`GWPRegisterPotentials[$potentials1D, "1D"];
+MaddoxScience`GWPTools`GWPRegistry`GWPRegisterPotentials[$potentials1D, "1D"];
 Clear[$potentials1D];
 
 
@@ -1243,11 +1243,11 @@ $regEng = Join[#, {"Energies", "1D"}] & /@ {
 
 
 (* --- Registry Assembly --- *)
-$reg1D = Join[$regStatic, $regDynamic, $regWave, $regProb, $regExp, $regEng];
-Clear[$regStatic, $regDynamic, $regWave, $regProb, $regExp, $regEng];
+$reg1D = Join[$regStatic,$regDynamic, $regWave,$regProb, $regExp,$regEng];
+Clear[$regStatic,$regDynamic, $regWave,$regProb, $regExp,$regEng];
 
 
-GWPTools`GWPRegistry`GWPRegisterExtension[$reg1D];
+MaddoxScience`GWPTools`GWPRegistry`GWPRegisterExtension[$reg1D];
 Clear[$reg1D];
 
 
@@ -1268,7 +1268,7 @@ Opacity[1],Thickness[0.04],Darker@Blue,Line[Table[{x,-Exp[-4 x^2]},{x,-1.1,1.1,0
 },
 ImageSize->32,PlotRange->{{-1.1,1.1},{-1.1,1.1}}];
 
-GWPTools`GWPDeveloper`GWP1DUI[data_] := Module[
+MaddoxScience`GWPTools`GWPDeveloper`GWP1DUI[data_] := Module[
   {potDisplay, paramsList, h, m, init, visible, hidden},
   
   potDisplay = data["Potential"];
@@ -1299,13 +1299,16 @@ GWPTools`GWPDeveloper`GWP1DUI[data_] := Module[
 (*End*)
 
 
-(* --- End "GWPTools`GWPEngine1D`Private`" --- *)
-If[TrueQ[Global`$GWPDebug], Print["[GWPEngine1D] End Private"]];
+(* --- End "MaddoxScience`GWPTools`GWPEngine1D`Private`" --- *)
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPEngine1D] End Private"]];
 End[]
 
 (* Hide internal code for all Developer functions from the ? menu *)
-SetAttributes[Evaluate[Names["GWPTools`GWPEngine1D`*"]], {ReadProtected}];
+SetAttributes[Evaluate[Names["MaddoxScience`GWPTools`GWPEngine1D`*"]], {ReadProtected}];
 
-(* --- End "GWPTools`GWPEngine1D`" --- *)
-If[TrueQ[Global`$GWPDebug], Print["[GWPEngine1D] EndPackage"]];
+(* --- End "MaddoxScience`GWPTools`GWPEngine1D`" --- *)
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPEngine1D] EndPackage"]];
 EndPackage[]
+
+(* Scrub backend context to keep the user namespace pristine *)
+$ContextPath = DeleteCases[$ContextPath, "MaddoxScience`GWPTools`GWPEngine1D`"];
