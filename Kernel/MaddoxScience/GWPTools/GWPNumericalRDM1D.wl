@@ -13,8 +13,8 @@
 
 
 (* --- Hoist Usage Statements into the Developer Context --- *)
-Needs["GWPTools`GWPDeveloper`"];
-BeginPackage["GWPTools`GWPDeveloper`"]
+Needs["MaddoxScience`GWPTools`GWPDeveloper`"];
+BeginPackage["MaddoxScience`GWPTools`GWPDeveloper`"]
 
 If[TrueQ[Global`$GWPDebug], Print["[GWPNumericalRDM1D] BeginPackage GWPDeveloper"]];
 
@@ -40,7 +40,7 @@ If[TrueQ[Global`$GWPDebug], Print["[GWPNumericalRDM1D] EndPackage GWPDeveloper"]
 
 Quiet[EndPackage[], General::shdw]
 
-$ContextPath = DeleteCases[$ContextPath, "GWPTools`GWPDeveloper`"];
+$ContextPath = DeleteCases[$ContextPath, "MaddoxScience`GWPTools`GWPDeveloper`"];
 
 
 (* ::Section::Closed:: *)
@@ -48,18 +48,18 @@ $ContextPath = DeleteCases[$ContextPath, "GWPTools`GWPDeveloper`"];
 
 
 (* ========================================================================= *)
-(* PACKAGE     : GWPTools`GWPNumericalRDM1D`                                 *)
+(* PACKAGE     : MaddoxScience`GWPTools`GWPNumericalRDM1D`                                 *)
 (* DESCRIPTION : Numerical integration extensions for Reduced Density GWPs.  *)
 (* ========================================================================= *)
 
-BeginPackage["GWPTools`GWPNumericalRDM1D`"]
+BeginPackage["MaddoxScience`GWPTools`GWPNumericalRDM1D`"]
 If[TrueQ[Global`$GWPDebug], Print["[GWPNumericalRDM1D] BeginPackage"]];
 Begin["`Private`"]
 If[TrueQ[Global`$GWPDebug], Print["[GWPNumericalRDM1D] Begin Private"]];
 
-Needs["GWPTools`GWPDeveloper`"];
-Needs["GWPTools`GWPRegistry`"];
-Needs["GWPTools`GWPEngineRDM1D`"];
+Needs["MaddoxScience`GWPTools`GWPDeveloper`"];
+Needs["MaddoxScience`GWPTools`GWPRegistry`"];
+Needs["MaddoxScience`GWPTools`GWPEngineRDM1D`"];
 
 
 (* ::Section::Closed:: *)
@@ -146,7 +146,7 @@ $potentialsNumericalRDM1D = {
   {"NumericalCL", GWPRDM1DNUMERICALCL, "{\"NumericalCL\", V0, V1, V2, GAMMA, KT, TMin, TMax, Opts___}", "Parameterized"}
 };
 
-GWPTools`GWPRegistry`GWPRegisterPotentials[$potentialsNumericalRDM1D, "RDM1D"];
+MaddoxScience`GWPTools`GWPRegistry`GWPRegisterPotentials[$potentialsNumericalRDM1D, "RDM1D"];
 Clear[$potentialsNumericalRDM1D];
 
 
@@ -154,12 +154,12 @@ Clear[$potentialsNumericalRDM1D];
 (*End*)
 
 
-(* --- End "GWPTools`GWPNumericalRDM1D`Private`" --- *)
+(* --- End "MaddoxScience`GWPTools`GWPNumericalRDM1D`Private`" --- *)
 If[TrueQ[Global`$GWPDebug], Print["[GWPNumericalRDM1D] End Private"]];
 End[]
 
-SetAttributes[Evaluate[Names["GWPTools`GWPNumericalRDM1D`*"]], {ReadProtected}];
+SetAttributes[Evaluate[Names["MaddoxScience`GWPTools`GWPNumericalRDM1D`*"]], {ReadProtected}];
 
-(* --- End "GWPTools`GWPNumericalRDM1D`" --- *)
+(* --- End "MaddoxScience`GWPTools`GWPNumericalRDM1D`" --- *)
 If[TrueQ[Global`$GWPDebug], Print["[GWPNumericalRDM1D] EndPackage"]];
 EndPackage[]
