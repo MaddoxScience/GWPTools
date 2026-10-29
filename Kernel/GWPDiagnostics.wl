@@ -44,10 +44,10 @@ GWPFormatReport::usage = "GWPFormatReport[report] formats a TestReportObject int
 Begin["`Private`"]
 If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPDiagnostics] Begin Private"]];
 
-(* Capture Package Directory for test file routing *)
+(* Capture Package Directory for test file routing (2 levels up from Kernel/GWPDiagnostics.wl) *)
 $PackageDirectory = Quiet[
   If[$InputFileName =!= "", 
-    DirectoryName[$InputFileName, 4], 
+    DirectoryName[$InputFileName, 2], 
     NotebookDirectory[]
   ]
 ];

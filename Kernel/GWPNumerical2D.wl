@@ -114,11 +114,11 @@ GWP2DNDSolveCache[v00_, v10_, v01_, v20_, v02_, v11_, initList_, tMin_, tMax_, o
 ];
 
 (* The Temporal Router maps directly into the standard 17-element 2D parameter bus *)
-GWP2DNUMERICAL[v00_, v10_, v01_, v20_, v02_, v11_, tMin_, tMax_, opts___][t_?NumericQ][GWP2DARG] := Module[
+GWP2DNUMERICAL[v00_, v10_, v01_, v20_, v02_, v11_, tMin_, tMax_, opts___][t_][GWP2DARG] := Module[
   {sol, initList, 
    sRAXX, sIAXX, sRAYY, sIAYY, sRAXY, sIAXY, sX, sY, sPX, sPY, sRG, sIG},
   
-  If[t < tMin || t > tMax, 
+  If[NumericQ[t] && (t < tMin || t > tMax), 
     Message[GWP2DNUMERICAL::outofbounds, t, tMin, tMax];
     Return[$Failed];
   ];

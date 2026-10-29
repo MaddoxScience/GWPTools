@@ -112,7 +112,7 @@ GWPSS1DNDSolveCache[v0_, v1_, v2_, initList1_, initList2_, tMin_, tMax_, opts___
 ];
 
 (* The Temporal Router maps directly into the standard SS1D parameter bus *)
-GWPSS1DNUMERICAL[v0_, v1_, v2_, tMin_, tMax_, opts___][t_?NumericQ][GWPSS1DARG] := Module[
+GWPSS1DNUMERICAL[v0_, v1_, v2_, tMin_, tMax_, opts___][t_][GWPSS1DARG] := Module[
   {
    sol, init1, init2, 
    rat1, iat1, xt1, pt1, rgt1, igt1, 
@@ -120,7 +120,7 @@ GWPSS1DNUMERICAL[v0_, v1_, v2_, tMin_, tMax_, opts___][t_?NumericQ][GWPSS1DARG] 
    nval1, nval2, nval12
   },
   
-  If[t < tMin || t > tMax, 
+  If[NumericQ[t] && (t < tMin || t > tMax), 
     Message[GWPSS1DNUMERICAL::outofbounds, t, tMin, tMax];
     Return[$Failed];
   ];

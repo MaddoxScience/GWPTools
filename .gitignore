@@ -12,7 +12,7 @@ build/
 # Ignore all scratch work in Notebooks...
 Archive/*
 Developer/*
-Notebooks/*
+#Notebooks/*
 
 # ...BUT explicitly allow these two specific examples to upload
 

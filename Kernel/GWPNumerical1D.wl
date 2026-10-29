@@ -4,7 +4,7 @@
 (*GWPNumerical1D Package*)
 
 
-(* ::Section:: *)
+(* ::Section::Closed:: *)
 (*GWPDeveloper Usage Registration*)
 
 
@@ -22,7 +22,7 @@ Off[General::shdw];
 
 
 
-(* ::Subsection:: *)
+(* ::Subsection::Closed:: *)
 (*Usage Statements*)
 
 
@@ -97,14 +97,14 @@ GWP1DNDSolveCache[v0_, v1_, v2_, initList_, tMin_, tMax_, opts___] :=
     ig[tMin] == ig0
   };
 
-  Quiet @ NDSolveValue[Join[eqs, inits], {ra, ia, x, p, rg, ig}, {t, tMin, tMax}, opts]
+  Quiet@NDSolveValue[Join[eqs, inits], {ra, ia, x, p, rg, ig}, {t, tMin, tMax}, opts]
 ];
 
 (* The Temporal Router maps directly into the standard 1D parameter bus *)
-GWP1DNUMERICAL[v0_, v1_, v2_, tMin_, tMax_, opts___][t_?NumericQ][GWP1DARG] := Module[
+GWP1DNUMERICAL[v0_, v1_, v2_, tMin_, tMax_, opts___][t_][GWP1DARG] := Module[
   {solRA, solIA, solX, solP, solRG, solIG, initList},
   
-  If[t < tMin || t > tMax, 
+  If[NumericQ[t] && (t < tMin || t > tMax), 
     Message[GWP1DNUMERICAL::outofbounds, t, tMin, tMax];
     Return[$Failed];
   ];

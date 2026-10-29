@@ -105,10 +105,10 @@ GWPMC1DNDSolveCache[v0_, v1_, v2_, initLists_, tMin_, tMax_, opts___] :=
 
 (* The Temporal Router for N-State Superpositions *)
 With[{VAL = GWPMC1DVAL},
-  GWPMC1DNUMERICAL[v0_, v1_, v2_, tMin_, tMax_, opts___][t_?NumericQ][GWPMC1DARG] := Module[
+  GWPMC1DNUMERICAL[v0_, v1_, v2_, tMin_, tMax_, opts___][t_][GWPMC1DARG] := Module[
     {initLists, sol, rawVals, newDiags, newPacked, pureParam, offset},
     
-    If[t < tMin || t > tMax, 
+    If[NumericQ[t] && (t < tMin || t > tMax), 
       Message[GWPMC1DNUMERICAL::outofbounds, t, tMin, tMax];
       Return[$Failed];
     ];

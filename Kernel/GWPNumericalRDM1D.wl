@@ -16,7 +16,7 @@
 Needs["MaddoxScience`GWPTools`GWPDeveloper`"];
 BeginPackage["MaddoxScience`GWPTools`GWPDeveloper`"]
 
-If[TrueQ[Global`$GWPDebug], Print["[GWPNumericalRDM1D] BeginPackage GWPDeveloper"]];
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPNumericalRDM1D] BeginPackage GWPDeveloper"]];
 
 Off[General::shdw];
 
@@ -36,7 +36,7 @@ GWPRDM1DNDSolveCache::usage = "Internal memoization engine for RDM numerical var
 
 Off[General::shdw];
 
-If[TrueQ[Global`$GWPDebug], Print["[GWPNumericalRDM1D] EndPackage GWPDeveloper"]];
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPNumericalRDM1D] EndPackage GWPDeveloper"]];
 
 Quiet[EndPackage[], General::shdw]
 
@@ -53,9 +53,9 @@ $ContextPath = DeleteCases[$ContextPath, "MaddoxScience`GWPTools`GWPDeveloper`"]
 (* ========================================================================= *)
 
 BeginPackage["MaddoxScience`GWPTools`GWPNumericalRDM1D`"]
-If[TrueQ[Global`$GWPDebug], Print["[GWPNumericalRDM1D] BeginPackage"]];
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPNumericalRDM1D] BeginPackage"]];
 Begin["`Private`"]
-If[TrueQ[Global`$GWPDebug], Print["[GWPNumericalRDM1D] Begin Private"]];
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPNumericalRDM1D] Begin Private"]];
 
 Needs["MaddoxScience`GWPTools`GWPDeveloper`"];
 Needs["MaddoxScience`GWPTools`GWPRegistry`"];
@@ -97,12 +97,12 @@ GWPRDM1DNDSolveCache[v0_, v1_, v2_, gamma_, kT_, initList_, tMin_, tMax_, opts__
 ];
 
 (* The Temporal Router for Caldeira-Leggett Evolution *)
-GWPRDM1DNUMERICALCL[v0_, v1_, v2_, gamma_, kT_, tMin_, tMax_, opts___][t_?NumericQ][GWPRDM1DARG] := Module[
+GWPRDM1DNUMERICALCL[v0_, v1_, v2_, gamma_, kT_, tMin_, tMax_, opts___][t_][GWPRDM1DARG] := Module[
   {sol, initList, sxx0, sxp0, spp0, 
    sxxT, sxpT, sppT, xT, pT,
    raT, iaT, thetaT, rgT},
   
-  If[t < tMin || t > tMax, 
+  If[NumericQ[t] && (t < tMin || t > tMax), 
     Message[GWPRDM1DNUMERICAL::outofbounds, t, tMin, tMax];
     Return[$Failed];
   ];
@@ -132,7 +132,7 @@ GWPRDM1DNUMERICALCL[v0_, v1_, v2_, gamma_, kT_, tMin_, tMax_, opts___][t_?Numeri
 
 (* Overload for Standard Unitary Evolution (Forces gamma = 0 and kT = 0) *)
 With[{VAL = GWPRDM1DVAL},
-  GWPRDM1DNUMERICAL[v0_, v1_, v2_, tMin_, tMax_, opts___][t_?NumericQ][GWPRDM1DARG] := 
+  GWPRDM1DNUMERICAL[v0_, v1_, v2_, tMin_, tMax_, opts___][t_][GWPRDM1DARG] := 
     GWPRDM1DNUMERICALCL[v0, v1, v2, 0&, 0&, tMin, tMax, opts][t][VAL]
 ];
 
@@ -155,11 +155,11 @@ Clear[$potentialsNumericalRDM1D];
 
 
 (* --- End "MaddoxScience`GWPTools`GWPNumericalRDM1D`Private`" --- *)
-If[TrueQ[Global`$GWPDebug], Print["[GWPNumericalRDM1D] End Private"]];
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPNumericalRDM1D] End Private"]];
 End[]
 
 SetAttributes[Evaluate[Names["MaddoxScience`GWPTools`GWPNumericalRDM1D`*"]], {ReadProtected}];
 
 (* --- End "MaddoxScience`GWPTools`GWPNumericalRDM1D`" --- *)
-If[TrueQ[Global`$GWPDebug], Print["[GWPNumericalRDM1D] EndPackage"]];
+If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPNumericalRDM1D] EndPackage"]];
 EndPackage[]

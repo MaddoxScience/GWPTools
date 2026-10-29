@@ -4,7 +4,7 @@
 (*GWPEnsemble Package*)
 
 
-(* ::Section::Closed:: *)
+(* ::Section:: *)
 (*GWPTools Usage Declaration*)
 
 
@@ -20,7 +20,7 @@ If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPEnsemble] EndPackage GWPT
 EndPackage[]
 
 
-(* ::Section::Closed:: *)
+(* ::Section:: *)
 (*GWPDeveloper Usage Declaration*)
 
 
@@ -46,7 +46,7 @@ Quiet[EndPackage[], General::shdw]
 $ContextPath = DeleteCases[$ContextPath, "MaddoxScience`GWPTools`GWPDeveloper`"];
 
 
-(* ::Section::Closed:: *)
+(* ::Section:: *)
 (*BeginPackage*)
 
 
@@ -58,9 +58,6 @@ BeginPackage["MaddoxScience`GWPTools`GWPEnsemble`", {"MaddoxScience`GWPTools`"}]
 If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPEnsemble] BeginPackage"]];
 Begin["`Private`"]
 If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPEnsemble] Begin Private"]];
-
-Needs["MaddoxScience`GWPTools`GWPDeveloper`"];
-Needs["MaddoxScience`GWPTools`GWPRegistry`"];
 
 (* Load Engine Dependencies *)
 Needs["MaddoxScience`GWPTools`GWPEngine1D`"];
@@ -74,15 +71,30 @@ Needs["MaddoxScience`GWPTools`GWPHydrodynamicsSS1D`"];
 Needs["MaddoxScience`GWPTools`GWPHydrodynamicsMC1D`"];
 Needs["MaddoxScience`GWPTools`GWPHydrodynamics2D`"];
 
+Needs["MaddoxScience`GWPTools`GWPDeveloper`"];
+Needs["MaddoxScience`GWPTools`GWPRegistry`"];
 
-(* ::Section::Closed:: *)
+
+(* ::Section:: *)
 (*GWPEnsemble Dispatcher*)
 
 
-Options[GWPEnsemble] = {
-  "SamplingMethod" -> Automatic,
-  "Time" -> 0
-};
+Options[GWPEnsemble] = Join[
+  {
+    "SamplingMethod" -> Automatic,
+    "Time" -> 0,
+    "Grid" -> Automatic,
+    "Structure" -> "Staggered",
+    "IncludeCore" -> True,
+    WorkingPrecision -> Automatic
+  },
+  DeleteCases[Options[FindRoot], (WorkingPrecision -> _)]
+];
+
+(* Shared Precision & Parsing Helpers *)
+resolveNumWP[wp_] := If[wp === Automatic, MachinePrecision, wp];
+applyGridWP[expr_, wp_] := If[wp === Automatic, expr, N[expr, wp]];
+parse1DGrid[grid_] := If[ListQ[grid], First[grid], If[IntegerQ[grid], grid, 100]];
 
 GWPEnsemble[obj_MaddoxScience`GWPTools`GWPObject, opts:OptionsPattern[]] := Module[
   {type, method, t0, params, pot, evalParamsList},
@@ -125,21 +137,19 @@ GWPEnsemble[obj_MaddoxScience`GWPTools`GWPObject, opts:OptionsPattern[]] := Modu
 ];
 
 
-(* ::Section::Closed:: *)
+(* ::Section:: *)
 (*GWP1DENSEMBLE*)
 
 
 Options[GWP1DENSEMBLE] = {
   "SamplingMethod" -> Automatic,
-  "Grid" -> Automatic
+  "Grid" -> Automatic,
+  WorkingPrecision -> Automatic
 };
 
-(* Shared Parsing Helpers *)
-parse1DGrid[grid_] := If[ListQ[grid], First[grid], If[IntegerQ[grid], grid, 100]];
-
 parse1DBounds[grid_, rx_, ux_] := Which[
-  ListQ[grid] && Length[grid] == 2, grid[[2]],
   ListQ[grid] && Length[grid] == 2 && StringQ[grid[[2]]] && grid[[2]] === "3Sigma", {rx - 3*ux, rx + 3*ux},
+  ListQ[grid] && Length[grid] == 2, grid[[2]],
   True, {rx - 4*ux, rx + 4*ux}
 ];
 
@@ -148,9 +158,10 @@ With[{VAL = GWP1DVAL},
 
   (* --- Uniform Cumulative (Quantile) Sampling --- *)
   GWP1DENSEMBLE["UniformC" | Automatic, opts:OptionsPattern[]][GWP1DARG] := Module[
-    {grid, numPoints, cList},
+    {grid, wp, numPoints, cList},
     
     grid = OptionValue["Grid"];
+    wp = OptionValue[WorkingPrecision];
     numPoints = parse1DGrid[grid];
     
     cList = If[ListQ[grid] && Length[grid] == 2 && ListQ[grid[[2]]],
@@ -159,37 +170,40 @@ With[{VAL = GWP1DVAL},
     ];
     
     (* Listable mapping through the backend Inverse CDF *)
-    GWP1DXC[cList][VAL]
+    applyGridWP[GWP1DXC[cList][VAL], wp]
   ];
 
   (* --- Uniform Spatial Sampling --- *)
   GWP1DENSEMBLE["UniformX", opts:OptionsPattern[]][GWP1DARG] := Module[
-    {grid, numPoints, ux, bounds},
+    {grid, wp, numPoints, ux, bounds},
     
     grid = OptionValue["Grid"];
+    wp = OptionValue[WorkingPrecision];
     numPoints = parse1DGrid[grid];
     ux = 1 / (2 * Sqrt[RA]);
     bounds = parse1DBounds[grid, RX, ux];
     
-    Subdivide[bounds[[1]], bounds[[2]], numPoints - 1]
+    applyGridWP[Subdivide[bounds[[1]], bounds[[2]], numPoints - 1], wp]
   ];
 
   (* --- Random Spatial Sampling (Analytic Normal Distribution) --- *)
   GWP1DENSEMBLE["Random", opts:OptionsPattern[]][GWP1DARG] := Module[
-    {grid, numPoints, ux},
+    {grid, wp, numPoints, ux},
     
     grid = OptionValue["Grid"];
+    wp = resolveNumWP[OptionValue[WorkingPrecision]];
     numPoints = parse1DGrid[grid];
     ux = 1 / (2 * Sqrt[RA]);
     
-    Sort[RandomVariate[NormalDistribution[RX, ux], numPoints]]
+    Sort[RandomVariate[NormalDistribution[RX, ux], numPoints, WorkingPrecision -> wp]]
   ];
 
   (* --- Random Density Sampling (Numerical Probability Distribution) --- *)
   GWP1DENSEMBLE["RandomDensity", opts:OptionsPattern[]][GWP1DARG] := Module[
-    {grid, numPoints, ux, bounds, dist, x},
+    {grid, wp, numPoints, ux, bounds, dist, x},
     
     grid = OptionValue["Grid"];
+    wp = resolveNumWP[OptionValue[WorkingPrecision]];
     numPoints = parse1DGrid[grid];
     ux = 1 / (2 * Sqrt[RA]);
     bounds = parse1DBounds[grid, RX, ux];
@@ -201,7 +215,7 @@ With[{VAL = GWP1DVAL},
       Method -> "Normalize"
     ];
     
-    Sort[RandomVariate[dist, numPoints]]
+    Sort[RandomVariate[dist, numPoints, WorkingPrecision -> wp]]
   ];
 
   (* --- Fallback Error Routing --- *)
@@ -213,7 +227,7 @@ With[{VAL = GWP1DVAL},
 ]; (* End With *)
 
 
-(* ::Section::Closed:: *)
+(* ::Section:: *)
 (*GWPSS1DEnsemble*)
 
 
@@ -223,8 +237,6 @@ Options[GWPSS1DENSEMBLE] = Join[
 ];
 
 (* Shared SS1D Parsing Helpers *)
-parse1DGrid[grid_] := If[ListQ[grid], First[grid], If[IntegerQ[grid], grid, 100]];
-
 parseSS1DBounds[valList_, grid_] := Module[
   {w1, w2, rx1, rx2, ux1, ux2, bx},
   
@@ -245,37 +257,42 @@ With[{VAL = GWPSS1DVAL},
 
   (* --- Uniform Cartesian Spatial Sampling --- *)
   GWPSS1DENSEMBLE["UniformX" | "Cartesian" | Automatic, opts:OptionsPattern[]][GWPSS1DARG] := Module[
-    {grid, numPoints, boundsX},
+    {grid, wp, numPoints, boundsX},
     
     grid = OptionValue["Grid"];
+    wp = OptionValue[WorkingPrecision];
     numPoints = parse1DGrid[grid];
     boundsX = parseSS1DBounds[{VAL}, grid];
     
-    Subdivide[boundsX[[1]], boundsX[[2]], numPoints - 1]
+    applyGridWP[Subdivide[boundsX[[1]], boundsX[[2]], numPoints - 1], wp]
   ];
 
   (* --- Random Density Sampling (Numerical Rejection Sampling) --- *)
   GWPSS1DENSEMBLE["RandomDensity", opts:OptionsPattern[]][GWPSS1DARG] := Module[
-    {grid, numPoints, boundsX, w1, w2, maxRho, pts = {}, nNeeded, cX, cZ, densities, selector},
+    {grid, wp, numPoints, boundsX, w1, w2, maxRho, pts = {}, nNeeded, cX, cZ, densities, selector},
     
     grid = OptionValue["Grid"];
+    wp = resolveNumWP[OptionValue[WorkingPrecision]];
     numPoints = parse1DGrid[grid];
-    boundsX = parseSS1DBounds[{VAL}, grid];
+    boundsX = N[parseSS1DBounds[{VAL}, grid], wp];
     
     w1 = {VAL}[[1]]; 
     w2 = {VAL}[[2]];
     
-    (* Explicitly pass '0' for the derivative argument to prevent integer matching trap *)
-    maxRho = 1.5 * Max[
-      GWPSS1DRHOX[0][w1[[3]]][VAL],
-      GWPSS1DRHOX[0][w2[[3]]][VAL]
+    (* Explicitly pass '0' for the derivative argument and use exact 3/2 to preserve arbitrary precision *)
+    maxRho = N[
+      (3/2) * Max[
+        GWPSS1DRHOX[0][w1[[3]]][VAL],
+        GWPSS1DRHOX[0][w2[[3]]][VAL]
+      ],
+      wp
     ];
     
     nNeeded = numPoints;
     
     While[Length[pts] < numPoints,
-      cX = RandomReal[boundsX, nNeeded];
-      cZ = RandomReal[{0, maxRho}, nNeeded];
+      cX = RandomReal[boundsX, nNeeded, WorkingPrecision -> wp];
+      cZ = RandomReal[{0, maxRho}, nNeeded, WorkingPrecision -> wp];
       
       (* Explicitly pass '0' for the derivative argument *)
       densities = GWPSS1DRHOX[0][#][VAL] & /@ cX; 
@@ -285,14 +302,15 @@ With[{VAL = GWPSS1DVAL},
       nNeeded = numPoints - Length[pts];
     ];
     
-    Take[pts, numPoints]
+    Sort[Take[pts, numPoints]]
   ];
 
   (* --- Inverse Cumulative Root-Finding --- *)
   GWPSS1DENSEMBLE["InverseC", opts:OptionsPattern[]][GWPSS1DARG] := Module[
-    {grid, numPoints, boundsX, cGrid, frOpts, x, firstRoot},
+    {grid, wp, numPoints, boundsX, cGrid, frOpts, x, firstRoot},
     
     grid = OptionValue["Grid"];
+    wp = resolveNumWP[OptionValue[WorkingPrecision]];
     numPoints = parse1DGrid[grid];
     boundsX = parseSS1DBounds[{VAL}, grid];
     
@@ -301,7 +319,11 @@ With[{VAL = GWPSS1DVAL},
       Range[1/(2*numPoints), 1 - 1/(2*numPoints), 1/numPoints]
     ];
     
-    frOpts = FilterRules[{opts}, Options[FindRoot]];
+    (* Filter only valid FindRoot options and prepend our resolved WorkingPrecision *)
+    frOpts = Join[
+      {WorkingPrecision -> wp},
+      DeleteCases[FilterRules[{opts}, Options[FindRoot]], (WorkingPrecision -> _)]
+    ];
     
     (* Explicitly pass '0' to the Jacobian density function *)
     firstRoot = x /. Quiet @ FindRoot[
@@ -317,7 +339,7 @@ With[{VAL = GWPSS1DVAL},
           GWPSS1DCX[x][VAL] - currC == 0,
           {x, prevX, boundsX[[1]] - 5, boundsX[[2]] + 5},
           Jacobian :> {{GWPSS1DRHOX[0][x][VAL]}},
-          Evaluate[frOpts]
+          Evaluate[Sequence @@ frOpts]
         ]
       ],
       firstRoot,
@@ -334,7 +356,7 @@ With[{VAL = GWPSS1DVAL},
 ]; (* End With *)
 
 
-(* ::Section::Closed:: *)
+(* ::Section:: *)
 (*GWPMC1DEnsemble*)
 
 
@@ -342,8 +364,6 @@ Options[GWPMC1DENSEMBLE] = Join[
   {"SamplingMethod" -> Automatic, "Grid" -> Automatic},
   Options[FindRoot]
 ];
-
-parse1DGrid[grid_] := If[ListQ[grid], First[grid], If[IntegerQ[grid], grid, 100]];
 
 parseMC1DBounds[valList_, grid_] := Module[
   {nStates, packed, minX, maxX, rx, ux, param, i},
@@ -369,36 +389,42 @@ With[{VAL = GWPMC1DVAL},
 
   (* --- Uniform Cartesian Spatial Sampling --- *)
   GWPMC1DENSEMBLE["UniformX" | "Cartesian" | Automatic, opts:OptionsPattern[]][GWPMC1DARG] := Module[
-    {grid, numPoints, boundsX},
+    {grid, wp, numPoints, boundsX},
     
     grid = OptionValue["Grid"];
+    wp = OptionValue[WorkingPrecision];
     numPoints = parse1DGrid[grid];
     boundsX = parseMC1DBounds[{VAL}, grid];
     
-    Subdivide[boundsX[[1]], boundsX[[2]], numPoints - 1]
+    applyGridWP[Subdivide[boundsX[[1]], boundsX[[2]], numPoints - 1], wp]
   ];
 
   (* --- Random Density Sampling (Numerical Rejection Sampling) --- *)
   GWPMC1DENSEMBLE["RandomDensity", opts:OptionsPattern[]][GWPMC1DARG] := Module[
-    {grid, numPoints, boundsX, maxRho, pts = {}, nNeeded, cX, cZ, densities, selector, param, i},
+    {grid, wp, numPoints, boundsX, maxRho, pts = {}, nNeeded, cX, cZ, densities, selector, param, i},
     
     grid = OptionValue["Grid"];
+    wp = resolveNumWP[OptionValue[WorkingPrecision]];
     numPoints = parse1DGrid[grid];
-    boundsX = parseMC1DBounds[{VAL}, grid];
+    boundsX = N[parseMC1DBounds[{VAL}, grid], wp];
     
-    maxRho = 1.5 * Max[
-      Table[
-        param = PACKEDPARAMS[[MC1DIndex[i, i, NSTATES]]];
-        GWPMC1DRHOX[0][param[[3]]][VAL],
-        {i, 1, NSTATES}
-      ]
+    (* Use exact 3/2 instead of 1.5 to preserve arbitrary precision *)
+    maxRho = N[
+      (3/2) * Max[
+        Table[
+          param = PACKEDPARAMS[[MC1DIndex[i, i, NSTATES]]];
+          GWPMC1DRHOX[0][param[[3]]][VAL],
+          {i, 1, NSTATES}
+        ]
+      ],
+      wp
     ];
     
     nNeeded = numPoints;
     
     While[Length[pts] < numPoints,
-      cX = RandomReal[boundsX, nNeeded];
-      cZ = RandomReal[{0, maxRho}, nNeeded];
+      cX = RandomReal[boundsX, nNeeded, WorkingPrecision -> wp];
+      cZ = RandomReal[{0, maxRho}, nNeeded, WorkingPrecision -> wp];
       
       densities = GWPMC1DRHOX[0][#][VAL] & /@ cX; 
       selector = Thread[cZ < densities];
@@ -407,14 +433,15 @@ With[{VAL = GWPMC1DVAL},
       nNeeded = numPoints - Length[pts];
     ];
     
-    Take[pts, numPoints]
+    Sort[Take[pts, numPoints]]
   ];
 
   (* --- Inverse Cumulative Root-Finding --- *)
   GWPMC1DENSEMBLE["InverseC", opts:OptionsPattern[]][GWPMC1DARG] := Module[
-    {grid, numPoints, boundsX, cGrid, frOpts, x, firstRoot},
+    {grid, wp, numPoints, boundsX, cGrid, frOpts, x, firstRoot},
     
     grid = OptionValue["Grid"];
+    wp = resolveNumWP[OptionValue[WorkingPrecision]];
     numPoints = parse1DGrid[grid];
     boundsX = parseMC1DBounds[{VAL}, grid];
     
@@ -423,7 +450,11 @@ With[{VAL = GWPMC1DVAL},
       Range[1/(2*numPoints), 1 - 1/(2*numPoints), 1/numPoints]
     ];
     
-    frOpts = FilterRules[{opts}, Options[FindRoot]];
+    (* Filter only valid FindRoot options and prepend our resolved WorkingPrecision *)
+    frOpts = Join[
+      {WorkingPrecision -> wp},
+      DeleteCases[FilterRules[{opts}, Options[FindRoot]], (WorkingPrecision -> _)]
+    ];
     
     firstRoot = x /. Quiet @ FindRoot[
       GWPMC1DCX[x][VAL] - cGrid[[1]] == 0,
@@ -438,7 +469,7 @@ With[{VAL = GWPMC1DVAL},
           GWPMC1DCX[x][VAL] - currC == 0,
           {x, prevX, boundsX[[1]] - 5, boundsX[[2]] + 5},
           Jacobian :> {{GWPMC1DRHOX[0][x][VAL]}},
-          Evaluate[frOpts]
+          Evaluate[Sequence @@ frOpts]
         ]
       ],
       firstRoot,
@@ -455,7 +486,7 @@ With[{VAL = GWPMC1DVAL},
 ];
 
 
-(* ::Section::Closed:: *)
+(* ::Section:: *)
 (*GWP2DENSEMBLE*)
 
 
@@ -463,7 +494,8 @@ Options[GWP2DENSEMBLE] = {
   "SamplingMethod" -> Automatic,
   "Grid" -> Automatic,
   "Structure" -> "Staggered",
-  "IncludeCore" -> True
+  "IncludeCore" -> True,
+  WorkingPrecision -> Automatic
 };
 
 (* Shared 2D Parsing Helpers *)
@@ -491,9 +523,10 @@ With[{VAL = GWP2DVAL},
 
   (* --- Uniform Cartesian Spatial Sampling --- *)
   GWP2DENSEMBLE["Cartesian" | "UniformX" | Automatic, opts:OptionsPattern[]][GWP2DARG] := Module[
-    {g, mu, sigma, bx, by, xGrid, yGrid},
+    {g, wp, mu, sigma, bx, by, xGrid, yGrid},
     
     g = parse2DGrid[OptionValue["Grid"]];
+    wp = OptionValue[WorkingPrecision];
     mu = GWP2DRMAT[VAL];
     sigma = GWP2DCOVMAT[VAL];
     {bx, by} = parse2DBounds[OptionValue["Grid"], mu, sigma];
@@ -501,14 +534,15 @@ With[{VAL = GWP2DVAL},
     xGrid = Subdivide[bx[[1]], bx[[2]], g[[1]] - 1];
     yGrid = Subdivide[by[[1]], by[[2]], g[[2]] - 1];
     
-    Flatten[Outer[List, xGrid, yGrid], 1]
+    applyGridWP[Flatten[Outer[List, xGrid, yGrid], 1], wp]
   ];
 
   (* --- Affine Cumulative (Quantile) Sampling --- *)
   GWP2DENSEMBLE["AffineC", opts:OptionsPattern[]][GWP2DARG] := Module[
-    {g, mu, sigma, cGridX, cGridY, xGrid, yGrid, zMesh, L},
+    {g, wp, mu, sigma, cGridX, cGridY, xGrid, yGrid, zMesh, L},
     
     g = parse2DGrid[OptionValue["Grid"]];
+    wp = OptionValue[WorkingPrecision];
     mu = GWP2DRMAT[VAL];
     sigma = GWP2DCOVMAT[VAL];
     
@@ -520,37 +554,39 @@ With[{VAL = GWP2DVAL},
     zMesh = Flatten[Outer[List, xGrid, yGrid], 1];
     
     L = Transpose[CholeskyDecomposition[sigma]];
-    Map[(mu + L . #) &, zMesh]
+    applyGridWP[Map[(mu + L . #) &, zMesh], wp]
   ];
 
   (* --- Random Spatial Sampling (Analytic Normal Distribution) --- *)
   GWP2DENSEMBLE["Random", opts:OptionsPattern[]][GWP2DARG] := Module[
-    {g, mu, sigma},
+    {g, wp, mu, sigma},
     
     g = parse2DGrid[OptionValue["Grid"]];
+    wp = resolveNumWP[OptionValue[WorkingPrecision]];
     mu = GWP2DRMAT[VAL];
     sigma = GWP2DCOVMAT[VAL];
     
-    RandomVariate[MultinormalDistribution[mu, sigma], g[[3]]]
+    RandomVariate[MultinormalDistribution[mu, sigma], g[[3]], WorkingPrecision -> wp]
   ];
 
   (* --- Random Density Sampling (Numerical Rejection Sampling) --- *)
   GWP2DENSEMBLE["RandomDensity", opts:OptionsPattern[]][GWP2DARG] := Module[
-    {g, mu, sigma, bx, by, maxRho, pts = {}, nNeeded, cX, cY, cZ, densities, selector},
+    {g, wp, mu, sigma, bx, by, maxRho, pts = {}, nNeeded, cX, cY, cZ, densities, selector},
     
     g = parse2DGrid[OptionValue["Grid"]];
+    wp = resolveNumWP[OptionValue[WorkingPrecision]];
     mu = GWP2DRMAT[VAL];
     sigma = GWP2DCOVMAT[VAL];
-    {bx, by} = parse2DBounds[OptionValue["Grid"], mu, sigma];
+    {bx, by} = N[parse2DBounds[OptionValue["Grid"], mu, sigma], wp];
     
-    (* Evaluate max density safely at the spatial center *)
-    maxRho = GWP2DRHOX[mu[[1]], mu[[2]]][VAL]; 
+    (* Evaluate max density safely at the spatial center at precision wp *)
+    maxRho = N[GWP2DRHOX[mu[[1]], mu[[2]]][VAL], wp]; 
     nNeeded = g[[3]];
     
     While[Length[pts] < g[[3]],
-      cX = RandomReal[bx, nNeeded];
-      cY = RandomReal[by, nNeeded];
-      cZ = RandomReal[{0, maxRho}, nNeeded];
+      cX = RandomReal[bx, nNeeded, WorkingPrecision -> wp];
+      cY = RandomReal[by, nNeeded, WorkingPrecision -> wp];
+      cZ = RandomReal[{0, maxRho}, nNeeded, WorkingPrecision -> wp];
       
       (* Map the backend density formula cleanly over the coordinate arrays *)
       densities = MapThread[GWP2DRHOX[#1, #2][VAL] &, {cX, cY}];
@@ -565,9 +601,10 @@ With[{VAL = GWP2DVAL},
 
   (* --- Polar Cumulative (Quantile) Sampling --- *)
   GWP2DENSEMBLE["PolarC", opts:OptionsPattern[]][GWP2DARG] := Module[
-    {g, structure, includeCore, crList, paramGrid, offset},
+    {g, wp, structure, includeCore, crList, paramGrid, offset},
     
     g = parse2DGrid[OptionValue["Grid"]];
+    wp = OptionValue[WorkingPrecision];
     structure = OptionValue["Structure"];
     includeCore = OptionValue["IncludeCore"];
     
@@ -584,7 +621,7 @@ With[{VAL = GWP2DVAL},
     If[includeCore, PrependTo[paramGrid, {0, 0}]];
     
     (* Apply the 2D backend Inverse CDF to the generated phase points *)
-    Map[GWP2DXC[#[[1]], #[[2]]][VAL] &, paramGrid]
+    applyGridWP[Map[GWP2DXC[#[[1]], #[[2]]][VAL] &, paramGrid], wp]
   ];
 
   (* --- Fallback Error Routing --- *)

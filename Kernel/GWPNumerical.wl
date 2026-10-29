@@ -8,14 +8,13 @@
 (*GWPTools Usage Registration*)
 
 
-(*BeginPackage["MaddoxScience`GWPTools`"]
+BeginPackage["MaddoxScience`GWPTools`"]
 If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPNumerical] BeginPackage GWPTools"]];
 
-(* The Numerical Extension operates entirely via the Potential Registry. *)
-(* No new top-level GWPTools usage symbols are strictly required.        *)
+GWPClearCache::usage = "GWPClearCache[] clears all memoized NDSolveValue trajectory caches across loaded GWPNumerical packages.\nGWPClearCache[\"Quiet\"] clears the caches silently.";
 
 If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPNumerical] EndPackage GWPTools"]];
-EndPackage[]*)
+EndPackage[]
 
 
 (* ::Section::Closed:: *)
@@ -34,6 +33,39 @@ If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPNumerical] Begin Private"
 
 Needs["MaddoxScience`GWPTools`"];
 Needs["MaddoxScience`GWPTools`GWPRegistry`"];
+
+
+(* ::Section::Closed:: *)
+(*Cache Management Utilities*)
+
+
+(* Clear all memoized NDSolveValue trajectories across all loaded GWPNumerical packages *)
+GWPClearCache[mode_String : "Verbose"] := Module[{cacheSyms, shortNames},
+  cacheSyms = Union @ Join[
+    Names["MaddoxScience`GWPTools`*`*NDSolveCache*"],
+    Names["MaddoxScience`GWPTools`*`Private`*NDSolveCache*"]
+  ];
+  Scan[
+    Function[symName,
+      With[{s = Symbol[symName]},
+        Module[{attrs = Attributes[s]},
+          Unprotect[s];
+          ClearAttributes[s, ReadProtected];
+          DownValues[s] = Select[
+            DownValues[s],
+            !FreeQ[First[#], Pattern | Blank | BlankSequence | BlankNullSequence] &
+          ];
+          Attributes[s] = attrs;
+        ]
+      ]
+    ],
+    cacheSyms
+  ];
+  If[!StringMatchQ[mode, "Quiet", IgnoreCase -> True],
+    shortNames = Last /@ StringSplit[cacheSyms, "`"];
+    Print["[GWPNumerical] Cleared caches: ", shortNames];
+  ];
+];
 
 
 (* ::Section::Closed:: *)
