@@ -93,6 +93,8 @@ GWPUsageTable::usage = "GWPUsageTable[{sym1, sym2, ...}] formats the usage state
   
 GWPScalarQ::usage = "GWPScalarQ[exp] returns True if exp is a scalar symbol or number.";
 
+GWPExtractIFDATA::usage = "GWPExtractIFDATA[intfun] extracts raw domain, grid, and exact derivative data directly from the internal structure of an InterpolatingFunction, returning an Association.";
+
 
 (* ::Section::Closed:: *)
 (*Private*)
@@ -162,6 +164,46 @@ GWPUsageTable[symbs_List, opts : OptionsPattern[]] :=
 
 
 GWPScalarQ[val_] := FreeQ[val, List];
+
+
+(* --- InterpolatingFunction Anatomy Extractor --- *)
+Needs["DifferentialEquations`InterpolatingFunctionAnatomy`"];
+
+GWPExtractIFDATA[intfun_InterpolatingFunction] := Module[
+  {domain, coords, grid, values, iOrder, dOrder, iParam, iFlag, nDeriv, deriv},
+  
+  domain = InterpolatingFunctionDomain[intfun];
+  coords = InterpolatingFunctionCoordinates[intfun];
+  grid   = InterpolatingFunctionGrid[intfun];
+  values = InterpolatingFunctionValuesOnGrid[intfun];
+  iOrder = InterpolatingFunctionInterpolationOrder[intfun];
+  dOrder = InterpolatingFunctionDerivativeOrder[intfun];
+  
+  iParam = intfun[[2]];
+  iFlag  = iParam[[2]];
+  nDeriv = iParam[[3]];
+  
+  Which[
+    iFlag == 3,
+      deriv = Transpose[intfun[[4]]],
+    iFlag == 7,
+      deriv = Developer`FromPackedArray[intfun[[4, 3]]];
+      deriv = Transpose[Partition[deriv, nDeriv + 1]],
+    True,
+      deriv = intfun[[4]]
+  ];
+  
+  Association[
+    "Domain"             -> domain,
+    "Coordinates"        -> coords,
+    "Grid"               -> grid,
+    "Values"             -> values,
+    "InterpolationOrder" -> iOrder,
+    "DerivativeOrder"    -> dOrder,
+    "Parameters"         -> iParam,
+    "RawDerivatives"     -> deriv
+  ]
+];
 
 
 (* ::Section::Closed:: *)

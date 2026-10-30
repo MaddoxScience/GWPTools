@@ -103,6 +103,9 @@ GWP1DFHOLIN::usage = "GWP1DFHOLIN[omega, AK][t][param] evaluates the linear-driv
 GWP1DFHORES::usage = "GWP1DFHORES[omega, AK][t][param] evaluates the resonant-driven harmonic oscillator parameters.";
 GWP1DFHONON::usage = "GWP1DFHONON[omega, AK, omega1][t][param] evaluates the non-resonant-driven harmonic oscillator parameters.";
 
+(* --- Carter's Chirp Pulse Potential Model --- *)
+GWP1DCHIRPED::usage = "GWP1DCHIRPED[omega, tau][t][param] evaluates the adiabatically softening chirped harmonic trap parameters with frequency omega/(1 + t/tau)^2.";
+
 (* --- GWP1D Potential Energy and Force Functions --- *)
 GWP1DPEX::usage = "GWP1DPEX[x][param] evaluates the external potential energy.\n" <>
   "GWP1DPEX[n][x][param] evaluates the nth spatial derivative of the external potential energy.";
@@ -715,6 +718,65 @@ GWP1DFHONONIGT[t_,OMEGA_,FA_,OMEGA1_][GWP1DARG]=GWP1DHARMONICIGT[t,OMEGA][GWP1DV
 
 
 (* ::Subsection::Closed:: *)
+(*Chirped Harmonic Trap*)
+
+
+GWP1DCHIRPEDFUN = {GWP1DCHIRPEDRAT, GWP1DCHIRPEDIAT, GWP1DCHIRPEDRXT, GWP1DCHIRPEDRPT, GWP1DCHIRPEDRGT, GWP1DCHIRPEDIGT};
+SetAttributes[GWP1DCHIRPEDFUN, Listable];
+
+GWP1DCHIRPED[OMEGA_:1, TAU_:5][t_][GWP1DARG] = Sequence @@ {
+  Sequence @@ Through[Through[GWP1DCHIRPEDFUN[t, OMEGA, TAU]][GWP1DVAL]],
+  NORM, HBAR, MASS, {0, 0, (MASS * OMEGA^2) / (2 * (1 + t / TAU)^4)}, INIT
+};
+
+(* Fundamental solutions c(t), s(t), c'(t), s'(t) and rescaled phase theta(t) *)
+GWP1DCHIRPEDTH[t_, OMEGA_, TAU_] = (OMEGA * t) / (1 + t / TAU);
+GWP1DCHIRPEDC[t_, OMEGA_, TAU_]  = (1 + t / TAU) * (Cos[(OMEGA * t) / (1 + t / TAU)] - Sin[(OMEGA * t) / (1 + t / TAU)] / (TAU * OMEGA));
+GWP1DCHIRPEDS[t_, OMEGA_, TAU_]  = (1 + t / TAU) * Sin[(OMEGA * t) / (1 + t / TAU)] / OMEGA;
+GWP1DCHIRPEDCP[t_, OMEGA_, TAU_] = (Cos[(OMEGA * t) / (1 + t / TAU)] - Sin[(OMEGA * t) / (1 + t / TAU)] / (TAU * OMEGA)) / TAU - (OMEGA * Sin[(OMEGA * t) / (1 + t / TAU)] + Cos[(OMEGA * t) / (1 + t / TAU)] / TAU) / (1 + t / TAU);
+GWP1DCHIRPEDSP[t_, OMEGA_, TAU_] = Sin[(OMEGA * t) / (1 + t / TAU)] / (TAU * OMEGA) + Cos[(OMEGA * t) / (1 + t / TAU)] / (1 + t / TAU);
+
+GWP1DCHIRPEDRAT[t_, OMEGA_, TAU_][GWP1DARG] = (MASS^2 * RA) / (
+  MASS^2 * (GWP1DCHIRPEDC[t, OMEGA, TAU] - (2 * HBAR * IA * GWP1DCHIRPEDS[t, OMEGA, TAU]) / MASS)^2 +
+  4 * HBAR^2 * RA^2 * GWP1DCHIRPEDS[t, OMEGA, TAU]^2
+);
+
+GWP1DCHIRPEDIAT[t_, OMEGA_, TAU_][GWP1DARG] = (
+  MASS * (
+    MASS * (GWP1DCHIRPEDC[t, OMEGA, TAU] - (2 * HBAR * IA * GWP1DCHIRPEDS[t, OMEGA, TAU]) / MASS) *
+           (GWP1DCHIRPEDCP[t, OMEGA, TAU] - (2 * HBAR * IA * GWP1DCHIRPEDSP[t, OMEGA, TAU]) / MASS) +
+    4 * HBAR^2 * RA^2 * GWP1DCHIRPEDS[t, OMEGA, TAU] * GWP1DCHIRPEDSP[t, OMEGA, TAU]
+  )
+) / (
+  2 * HBAR * (
+    MASS^2 * (GWP1DCHIRPEDC[t, OMEGA, TAU] - (2 * HBAR * IA * GWP1DCHIRPEDS[t, OMEGA, TAU]) / MASS)^2 +
+    4 * HBAR^2 * RA^2 * GWP1DCHIRPEDS[t, OMEGA, TAU]^2
+  )
+);
+
+GWP1DCHIRPEDRXT[t_, OMEGA_, TAU_][GWP1DARG] = GWP1DCHIRPEDC[t, OMEGA, TAU] * RX + (GWP1DCHIRPEDS[t, OMEGA, TAU] * RP) / MASS;
+
+GWP1DCHIRPEDRPT[t_, OMEGA_, TAU_][GWP1DARG] = MASS * GWP1DCHIRPEDCP[t, OMEGA, TAU] * RX + GWP1DCHIRPEDSP[t, OMEGA, TAU] * RP;
+
+GWP1DCHIRPEDLCT[t_, OMEGA_, TAU_][GWP1DARG] = (
+  GWP1DCHIRPEDRXT[t, OMEGA, TAU][GWP1DVAL] * GWP1DCHIRPEDRPT[t, OMEGA, TAU][GWP1DVAL] - RX * RP
+) / 2;
+
+GWP1DCHIRPEDRGT[t_, OMEGA_, TAU_][GWP1DARG] = RG + GWP1DCHIRPEDLCT[t, OMEGA, TAU][GWP1DVAL] - (HBAR / 2) * (
+  Pi * Floor[GWP1DCHIRPEDTH[t, OMEGA, TAU] / Pi] +
+  ArcTan[
+    (-1)^Floor[GWP1DCHIRPEDTH[t, OMEGA, TAU] / Pi] * (GWP1DCHIRPEDC[t, OMEGA, TAU] - (2 * HBAR * IA * GWP1DCHIRPEDS[t, OMEGA, TAU]) / MASS),
+    (-1)^Floor[GWP1DCHIRPEDTH[t, OMEGA, TAU] / Pi] * ((2 * HBAR * RA * GWP1DCHIRPEDS[t, OMEGA, TAU]) / MASS)
+  ]
+);
+
+GWP1DCHIRPEDIGT[t_, OMEGA_, TAU_][GWP1DARG] = IG + (HBAR / 4) * Log[
+  (GWP1DCHIRPEDC[t, OMEGA, TAU] - (2 * HBAR * IA * GWP1DCHIRPEDS[t, OMEGA, TAU]) / MASS)^2 +
+  (4 * HBAR^2 * RA^2 * GWP1DCHIRPEDS[t, OMEGA, TAU]^2) / MASS^2
+];
+
+
+(* ::Subsection::Closed:: *)
 (*External Potential and Force*)
 
 
@@ -1139,7 +1201,8 @@ $potentials1D = {
   {"ParabolicBarrier",    GWP1DPARABOLIC, "{\"ParabolicBarrier\", OMEGA}",                "Parameterized"},
   {"LinearForcedHO",      GWP1DFHOLIN,    "{\"LinearForcedHO\", OMEGA, AK}",              "Parameterized"},
   {"ResonantForcedHO",    GWP1DFHORES,    "{\"ResonantForcedHO\", OMEGA, AK}",            "Parameterized"},
-  {"NonResonantForcedHO", GWP1DFHONON,    "{\"NonResonantForcedHO\", OMEGA, AK, OMEGA1}", "Parameterized"}
+  {"NonResonantForcedHO", GWP1DFHONON,    "{\"NonResonantForcedHO\", OMEGA, AK, OMEGA1}", "Parameterized"},
+  {"ChirpedTrap",         GWP1DCHIRPED,   "{\"ChirpedTrap\", OMEGA, TAU}",                "Parameterized"}
 };
 
 

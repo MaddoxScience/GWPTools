@@ -4,7 +4,7 @@
 (*GWPEnsemble Package*)
 
 
-(* ::Section:: *)
+(* ::Section::Closed:: *)
 (*GWPTools Usage Declaration*)
 
 
@@ -13,14 +13,23 @@ If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPEnsemble] BeginPackage GW
 
 GWPEnsemble::usage = "GWPEnsemble[GWPObject[], options] generates a structured phase-space or coordinate ensemble for the given wavepacket.";
 
+GWPEnsembleSolve::usage = "GWPEnsembleSolve[X0DAT, VFUN, {t, tMin, tMax}, opts] propagates a 1st-order kinematic ensemble.\n" <>
+  "GWPEnsembleSolve[X0DAT, V0DAT, AFUN, {t, tMin, tMax}, opts] propagates a 2nd-order dynamic ensemble.\n" <>
+  "GWPEnsembleSolve[GWPObject[], X0DAT, {t, tMin, tMax}, opts] automatically propagates Bohmian trajectories using the wavepacket's hydrodynamic velocity field.";
+
+GWPEnsembleParse::usage = "GWPEnsembleParse[X0DAT, SOLN] extracts the exact interpolation grid and derivative tensors from NDSolve output.";
+
+GWPEnsembleFormat::usage = "GWPEnsembleFormat[ParsedData, key, opts] reshapes N-dimensional trajectory array data into standard paired lists for plotting.";
+
 (* --- Messages --- *)
 GWPEnsemble::badtype = "Unrecognized GWPType: `1`. The corresponding hydrodynamics extension may not be loaded.";
+GWPEnsembleFormat::badshape = "Data array contains `1` elements, which does not match NT, NT*NS, or NT*NS*ND.";
 
 If[TrueQ[MaddoxScience`GWPTools`$GWPDebug], Print["[GWPEnsemble] EndPackage GWPTools"]];
 EndPackage[]
 
 
-(* ::Section:: *)
+(* ::Section::Closed:: *)
 (*GWPDeveloper Usage Declaration*)
 
 
@@ -46,7 +55,7 @@ Quiet[EndPackage[], General::shdw]
 $ContextPath = DeleteCases[$ContextPath, "MaddoxScience`GWPTools`GWPDeveloper`"];
 
 
-(* ::Section:: *)
+(* ::Section::Closed:: *)
 (*BeginPackage*)
 
 
@@ -75,7 +84,7 @@ Needs["MaddoxScience`GWPTools`GWPDeveloper`"];
 Needs["MaddoxScience`GWPTools`GWPRegistry`"];
 
 
-(* ::Section:: *)
+(* ::Section::Closed:: *)
 (*GWPEnsemble Dispatcher*)
 
 
@@ -137,7 +146,7 @@ GWPEnsemble[obj_MaddoxScience`GWPTools`GWPObject, opts:OptionsPattern[]] := Modu
 ];
 
 
-(* ::Section:: *)
+(* ::Section::Closed:: *)
 (*GWP1DENSEMBLE*)
 
 
@@ -227,8 +236,8 @@ With[{VAL = GWP1DVAL},
 ]; (* End With *)
 
 
-(* ::Section:: *)
-(*GWPSS1DEnsemble*)
+(* ::Section::Closed:: *)
+(*GWPSS1DENSEMBLE*)
 
 
 Options[GWPSS1DENSEMBLE] = Join[
@@ -356,8 +365,8 @@ With[{VAL = GWPSS1DVAL},
 ]; (* End With *)
 
 
-(* ::Section:: *)
-(*GWPMC1DEnsemble*)
+(* ::Section::Closed:: *)
+(*GWPMC1DENSEMBLE*)
 
 
 Options[GWPMC1DENSEMBLE] = Join[
@@ -486,7 +495,7 @@ With[{VAL = GWPMC1DVAL},
 ];
 
 
-(* ::Section:: *)
+(* ::Section::Closed:: *)
 (*GWP2DENSEMBLE*)
 
 
@@ -631,6 +640,152 @@ With[{VAL = GWP2DVAL},
   );
 
 ]; (* End With *)
+
+
+(* ::Section::Closed:: *)
+(*GWPEnsemble Trajectory Propagation and Formatting *)
+
+
+(* ==================================================================== *)
+(* 1. THE UNIVERSAL & GWP-AWARE ODE WRAPPER                             *)
+(* ==================================================================== *)
+Options[GWPEnsembleSolve] = Options[NDSolveValue];
+
+(* --- GWPObject Convenience Overload (1D, SS1D, MC1D, 2D) --- *)
+GWPEnsembleSolve[obj_MaddoxScience`GWPTools`GWPObject, X0DAT_List, {tSymbol_, tMin_, tMax_}, opts:OptionsPattern[]] := Module[
+  {type = obj["GWPType"], vFun},
+  vFun = Which[
+    MemberQ[{"1D", "SS1D", "MC1D"}, type],
+      Function[{x, t}, obj["VX"][x, t]],
+    type === "2D",
+      Function[{xy, t}, Transpose @ obj["VX"][xy[[All, 1]], xy[[All, 2]], t]],
+    True,
+      Message[GWPEnsemble::badtype, type]; Return[$Failed]
+  ];
+  GWPEnsembleSolve[X0DAT, vFun, {tSymbol, tMin, tMax}, opts]
+];
+
+(* --- Signature 1: First-Order Kinematics (Velocity Field) --- *)
+GWPEnsembleSolve[X0DAT_List, VFUN_, {tSymbol_, tMin_, tMax_}, opts:OptionsPattern[]] := Module[
+  {ndOpts, DIM, XX, XI, VAR, VEXP, EQN},
+  ndOpts = FilterRules[{opts}, Options[NDSolveValue]];
+  DIM = Dimensions[X0DAT];
+  
+  XX = Array[XI, DIM];
+  VAR = Flatten[XX];
+  VEXP = Flatten[VFUN[ArrayReshape[Through[VAR[tSymbol]], DIM], tSymbol]];
+  
+  EQN = {
+    Thread[Derivative[1][#][tSymbol] & /@ VAR == VEXP],
+    Thread[Derivative[0][#][tMin] & /@ VAR == Flatten[X0DAT]]
+  };
+  
+  NDSolveValue[EQN, VAR, {tSymbol, tMin, tMax}, Evaluate[Sequence @@ ndOpts]]
+];
+
+(* --- Signature 2: Second-Order Dynamics (Acceleration Field) --- *)
+GWPEnsembleSolve[X0DAT_List, V0DAT_List, AFUN_, {tSymbol_, tMin_, tMax_}, opts:OptionsPattern[]] := Module[
+  {ndOpts, DIM, XX, XI, VAR, AEXP, EQN},
+  ndOpts = FilterRules[{opts}, Options[NDSolveValue]];
+  DIM = Dimensions[X0DAT];
+  
+  XX = Array[XI, DIM];
+  VAR = Flatten[XX];
+  AEXP = Flatten[AFUN[ArrayReshape[Through[VAR[tSymbol]], DIM], tSymbol]];
+  
+  EQN = {
+    Thread[Derivative[2][#][tSymbol] & /@ VAR == AEXP],
+    Thread[Derivative[1][#][tMin] & /@ VAR == Flatten[V0DAT]],
+    Thread[Derivative[0][#][tMin] & /@ VAR == Flatten[X0DAT]]
+  };
+  
+  NDSolveValue[EQN, VAR, {tSymbol, tMin, tMax}, Evaluate[Sequence @@ ndOpts]]
+];
+
+(* ==================================================================== *)
+(* 2. THE DATA EXTRACTOR                                                *)
+(* ==================================================================== *)
+GWPEnsembleParse[X0DAT_, SOLN_List] := Module[
+  {DIM, NC, ND, NS, flatSOLN, allData, TDAT, NT, TDIM, rawDerivs, dOrder, parsedData},
+
+  DIM = Dimensions[X0DAT];
+  If[Length[DIM] == 1,
+    NC = DIM; ND = 1; NS = DIM[[1]];
+  ,
+    NC = DIM[[1 ;; -2]]; ND = Last[DIM]; NS = Times @@ NC;
+  ];
+  
+  flatSOLN = Flatten[SOLN];
+  allData = GWPExtractIFDATA /@ flatSOLN;
+  
+  TDAT = Flatten[allData[[1]]["Grid"]];
+  NT = Length[TDAT];
+  TDIM = Prepend[DIM, NT];
+  
+  rawDerivs = Lookup[allData, "RawDerivatives"];
+  dOrder = allData[[1]]["DerivativeOrder"];
+  
+  parsedData = Association[
+    "NC" -> NC, "ND" -> ND, "NS" -> NS, "DIM" -> DIM, 
+    "NT" -> NT, "TDIM" -> TDIM, "TDAT" -> TDAT,
+    "X0DAT" -> Table[ArrayReshape[rawDerivs[[All, 1, t]], DIM], {t, NT}],
+    "X1DAT" -> Table[ArrayReshape[rawDerivs[[All, 2, t]], DIM], {t, NT}]
+  ];
+  
+  If[dOrder >= 2,
+    AppendTo[parsedData, "X2DAT" -> Table[ArrayReshape[rawDerivs[[All, 3, t]], DIM], {t, NT}]]
+  ];
+  
+  parsedData
+];
+
+(* ==================================================================== *)
+(* 3. THE RE-SHAPER                                                     *)
+(* ==================================================================== *)
+Options[GWPEnsembleFormat] = {"Component" -> All, "PairWithTime" -> Automatic};
+
+GWPEnsembleFormat[ParsedData_Association, key_String : "X0DAT", opts:OptionsPattern[]] := Module[{rawData},
+  rawData = Lookup[ParsedData, key, $Failed];
+  If[rawData === $Failed, Return[$Failed]];
+  GWPEnsembleFormat[ParsedData, rawData, opts]
+];
+
+GWPEnsembleFormat[ParsedData_Association, rawData_List, OptionsPattern[]] := Module[
+  {NT, NS, ND, TDAT, comp, pairTime, totalElements, reshaped, sliced, finalND},
+  
+  NT = ParsedData["NT"]; NS = ParsedData["NS"]; 
+  ND = ParsedData["ND"]; TDAT = ParsedData["TDAT"];
+  
+  comp = OptionValue["Component"];
+  pairTime = OptionValue["PairWithTime"];
+  totalElements = Length[Flatten[rawData]];
+  
+  Which[
+    totalElements == NT * NS * ND,
+      reshaped = Transpose[ArrayReshape[rawData, {NT, NS, ND}], {2, 1, 3}];
+      If[IntegerQ[comp] && 1 <= comp <= ND,
+        sliced = reshaped[[All, All, comp]]; finalND = 1;
+      ,
+        sliced = reshaped; finalND = ND;
+      ];
+      If[finalND == 1 && TensorRank[sliced] == 3, sliced = ArrayReshape[sliced, {NS, NT}]];
+      If[pairTime === True || (pairTime === Automatic && finalND == 1),
+        Map[Transpose[{TDAT, #}] &, sliced], sliced
+      ],
+      
+    totalElements == NT * NS,
+      sliced = Transpose[ArrayReshape[rawData, {NT, NS}]];
+      If[pairTime === True || pairTime === Automatic, Map[Transpose[{TDAT, #}] &, sliced], sliced],
+      
+    totalElements == NT,
+      sliced = Flatten[rawData];
+      If[pairTime === True || pairTime === Automatic, Transpose[{TDAT, sliced}], sliced],
+      
+    True,
+      Message[GWPEnsembleFormat::badshape, totalElements];
+      $Failed
+  ]
+];
 
 
 (* ::Section::Closed:: *)
